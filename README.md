@@ -2,8 +2,9 @@ Version
 =======
 This is a script to enable simple versioning of git repositories based on tags with 'semantic versioning' like numbers. Only the SCMs meta data is used to store the version information - no need to change the repository content if the version increases.
 
-Semantic versioning is assumed to be like:
-major.minor.patch, eg. 1.0.21. Refer to http://semver.org/ for details.
+Semantic versioning is assumed to be like: major.minor.patch, eg. 1.0.21. Refer to http://semver.org/ for details.
+
+Mind: This script may create new versions by adding git tags **but it does not push**!
 
 Use Cases
 ---------
