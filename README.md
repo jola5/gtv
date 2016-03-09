@@ -1,8 +1,10 @@
-Version
-=======
-This is a script to enable simple versioning of git repositories based on tags with 'semantic versioning' like numbers. Only the SCMs meta data is used to store the version information - no need to change the repository content if the version increases.
+Git Tag Version
+===============
+This is a script to enable simple versioning of git repositories based on tags with 'semantic versioning' like numbers. Only the SCMs meta data is used to store the version information - no need to change the repository content if the version changes.
 
 Semantic versioning is assumed to be like: major.minor.patch, eg. 1.0.21. Refer to http://semver.org/ for details.
+
+Only monotonic increasing numbers are supported.
 
 Mind: This script may create new versions by adding git tags **but it does not push**!
 
@@ -19,6 +21,7 @@ TODO
 
 Basic Usage
 -----------
+Refer to the online help by calling ```version help``` on the command line for a complete list of supported commands.
 
 ``` bash
 # online help
@@ -34,5 +37,3 @@ version new patch
 # assign a specific version number
 version set <number>
 ```
-
-Refer to the online help by calling ```version help``` on the command line for details.
