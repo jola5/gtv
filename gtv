@@ -2,7 +2,7 @@
 
 #
 #
-# git tag versions
+# git tag version
 #
 #
 
@@ -11,44 +11,65 @@
 # display help
 function help
 {
-  echo "usage: gtv [command] [-m|--message=<message>] [-s|--suffix=<suffix>]
+  echo "NAME
+        gtv - git tag version
 
-Show current version number
-  show
+SYNOPSIS
+        gtv [command] [-m|--message=<message>] [-s|--suffix=<suffix>]
 
-Display this help text
-  help
+DESCRIPTION
+        Gtv is simple script to create git tags with a semantic versioning number
+        scheme. You may increase major, minor or patch number versions separately,
+        or define a complete new 'unrelated' version number als long as the number
+        to assign is monotonic increasing.
 
-Create a new git version number tag by simple increment. Add the optional
-message as tag message. Add the optional suffix as a suffix to the tag name.
-  new     <major|minor|patch> [-m|--message=<message>] [-s|--suffix=<suffix>]
+        Using the meta data of the git scm you omit the need to change your
+        reporitories contents' if the version number changes. On the othe hand
+        meta data itself is not under version control, thus deleting tags or
+        re-assigning tags with the same version number to different commits is
+        technically possible. However, it is not possible if you stay with gtv
+        to work on your version tags.
 
-Assign a specific git version number tag, must be increasing monotonic. Add the
-optional message as tag message. Add the optional suffix as a suffix to the tag
-name.
-  set     <version> [-m|--message=<message>] [-s|--suffix=<suffix>]
+        If no explicit command is given gtv executes 'show'.
 
-Examples:
-  # show current version, eg. 1.21.3
-  gtv show
-  # create a new tag with an increased minor version
-  gtv new minor
-  # show current version, eg. 1.22.0
-  gtv show
-  # assign an arbitrary but monotonic version number
-  gtv set 1.22.1
-  # show current version is the default command, eg. 1.22.1
-  gtv
-  # create a new tag with an increased major version and message
-  gtv new major -m NEW
-  # shows tag v2.0.0 with message \"NEW\"
-  git show $(git describe)
-  # create a new tag with an increased major version, message and tag suffix
-  gtv new major -m ALPHA -s alpha
-  # shows tag v3.0.0-alpha with message \"ALPHA\"
-  git show $(git describe)
-  # ERROR!!! Not a monotonic increaing number
-  gtv set 1.0.0
+COMMANDS
+        show
+                Show current version number
+
+        help
+                Display this help text
+
+        new     <major|minor|patch> [-m|--message=<message>] [-s|--suffix=<suffix>]
+                Create a new git version number tag by simple increment. Add the
+                optional message as annotated tag message. Add the optional suffix
+                as a suffix to the tag name itself.
+
+        set     <version> [-m|--message=<message>] [-s|--suffix=<suffix>]
+                Assign a specific git version number tag, must be increasing
+                monotonic. Add the optional message as tag message. Add the
+                optional suffix as a suffix to the tag name.
+
+EXAMPLES
+        # show current version, eg. 1.21.3
+        gtv show
+        # create a new tag with an increased minor version
+        gtv new minor
+        # show current version, eg. 1.22.0
+        gtv show
+        # assign an arbitrary but monotonic version number
+        gtv set 1.22.1
+        # show current version is the default command, eg. 1.22.1
+        gtv
+        # create a new tag with an increased major version and message
+        gtv new major -m NEW
+        # shows tag v2.0.0 with message \"NEW\"
+        git show $(git describe)
+        # create a new tag with an increased major version, message and tag suffix
+        gtv new major --message=ALPHA --suffix=-alpha
+        # shows tag v3.0.0-alpha with message \"ALPHA\"
+        git show \$(git describe)
+        # ERROR!!! Not a monotonic increaing number
+        gtv set 1.0.0
 "
 }
 
