@@ -1,10 +1,7 @@
 #!/bin/bash
 
-#
-#
 # git tag version
-#
-#
+# A script to use git tags for repository version numbers through a simple CLI
 
 ################################################################################
 
@@ -15,23 +12,28 @@ function help
         gtv - git tag version
 
 SYNOPSIS
-        gtv [command] [-m|--message=<message>] [-s|--suffix=<suffix>]
+        gtv [command] [-m|--message=<message>] [-t|--tag-suffix=<suffix>]
+            [-s|--strict]
 
 DESCRIPTION
+        A script to use git tags for repository version numbers through a simple
+        CLI.
+
         Gtv is simple script to create git tags with a semantic versioning number
-        scheme. You may increase major, minor or patch number versions separately,
-        or define a complete new 'unrelated' version number als long as the number
-        to assign is monotonic increasing.
+        scheme 'major.minor.patch', eg. 1.2.3. You may increase major, minor or
+        patch number versions separately, or define a complete new 'unrelated'
+        version number als long as the number to be assigned is monotonic
+        increasing.
 
         By using the meta data of the git scm you omit the need to change your
         reporitories contents' if the version number changes. On the other hand
         meta data itself is not under version control, thus deleting tags or
-        re-assigning tags with the same version number to different commits is
-        technically possible. However, this is not possible if you stay with gtv
-        to work on your version tags.
+        re-assigning tags with a similar version number to different commits is
+        technically possible ('v1.2.3' vs. 'V1.2.3'). However, this is not
+        possible if you stay with gtv to work on your version tags.
 
-        Mind, assigning mulitple version tags to the same commit is possible,
-        even with gtv.
+        Mind, assigning mulitple version tags to the same commit is possible
+        by default, if you want to omit this behaviour use the strict option.
 
         If no explicit command is given gtv executes 'show'.
 
@@ -42,15 +44,21 @@ COMMANDS
         help
                 Display this help text
 
-        new     <major|minor|patch> [-m|--message=<message>] [-s|--suffix=<suffix>]
-                Create a new git version number tag by simple increment. Add the
-                optional message as annotated tag message. Add the optional suffix
-                as a suffix to the tag name itself.
+        new     <major|minor|patch> [-m|--message=<message>] [-t|--tag-suffix=<suffix>]
+                [-s|--strict]
+                Create a new git version number tag by a simple increment to the
+                given version part major, minor or patch. Add the optional
+                message as annotated tag message. Add the optional tag suffixas
+                a suffix to the tag name itself. Do not allow assignment of
+                mulitple version tags to the same commit using 'strict'.
 
-        set     <version> [-m|--message=<message>] [-s|--suffix=<suffix>]
+        set     <version> [-m|--message=<message>] [-t|--tag-suffix=<suffix>]
+                [-s|--strict]
                 Assign a specific git version number tag, must be increasing
-                monotonic. Add the optional message as tag message. Add the
-                optional suffix as a suffix to the tag name.
+                monotonic. Add the optional message as annotated tag message.
+                Add the optional tag suffix as a suffix to the tag name itself.
+                Do not allow assignment of mulitple version tags to the same
+                commit using 'strict'.
 
 EXAMPLES
         # show current version, eg. 1.21.3
@@ -191,9 +199,10 @@ function set-version
 # defaults for the optional arguments
 MESSAGE=""
 SUFFIX=""
+STRICT=false
 
 # get the optional arguments
-ARGS=$(getopt -o m:s: -l "message:,suffix:" -n "getopt.sh" -- "$@");
+ARGS=$(getopt -o m:st: -l "message:,strict,tag-suffix:" -n "getopt.sh" -- "$@");
 
 #Bad arguments
 if [ $? -ne 0 ];
@@ -212,7 +221,15 @@ while true; do
         shift;
       fi
       ;;
-    -s|--suffix)
+    -s|--strict)
+      # TODO strict is Unsupported
+      echo "ERROR: strict option is currently not supported."
+      exit 1
+
+      STRICT=true
+      shift;
+      ;;
+    -t|--tag-suffix)
       shift;
       if [ -n "$1" ]; then
         SUFFIX=$1
