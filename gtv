@@ -32,17 +32,23 @@ DESCRIPTION
         technically possible ('v1.2.3' vs. 'V1.2.3'). However, this is not
         possible if you stay with gtv to work on your version tags.
 
+        The init command creates an initial 0.0.0 verison tag.
+
         Mind, assigning mulitple version tags to the same commit is possible
         by default, if you want to omit this behaviour use the strict option.
 
         If no explicit command is given gtv executes 'show'.
 
-COMMANDS
-        show
-                Show current version number
 
+COMMANDS
         help
-                Display this help text
+                Display this help text.
+
+        init
+                Initially create a 'v0.0.0' version tag, to be used on new repositories.
+
+        show
+                Show current version number.
 
         new     <major|minor|patch> [-m|--message=<message>] [-t|--tag-suffix=<suffix>]
                 [-s|--strict]
@@ -84,10 +90,15 @@ EXAMPLES
 "
 }
 
-# get current version tag and print its name
+# get current version tag and print its name, return 'none' if no version tag exists
 function get-current-version-tag
 {
   TAG=$(git tag --list -n1 | grep -E "^v[0-9]+.[0-9]+.[0-9]+\s+version [0-9]+.[0-9]+.[0-9]+" | tail -n1 | cut -d" " -f1)
+
+  if [ -z "$TAG" ]; then
+    TAG="none"
+  fi
+
   echo "$TAG"
 }
 
@@ -162,6 +173,13 @@ function new
 function set-version
 {
   CURRENT=$(get-current-version-tag | tr -d 'v')
+
+  VERSION_OK=false
+  if [ "$CURRENT" == "none" ]; then
+    VERSION_OK=true
+    CURRENT="0.0.0"
+  fi
+
   CURRENT_MAJOR=$(echo $CURRENT | cut -d. -f1)
   CURRENT_MINOR=$(echo $CURRENT | cut -d. -f2)
   CURRENT_PATCH=$(echo $CURRENT | cut -d. -f3)
@@ -169,7 +187,6 @@ function set-version
   NEW_MINOR=$(echo $1 | cut -d. -f2)
   NEW_PATCH=$(echo $1 | cut -d. -f3)
 
-  VERSION_OK=false
   if [ "$NEW_MAJOR" -gt "$CURRENT_MAJOR" ]; then
     VERSION_OK=true
   fi
@@ -191,6 +208,19 @@ function set-version
   else
     echo "ERROR: $1 is not a monotonic increasing version number. Current is $CURRENT."
     exit 1;
+  fi
+}
+
+# create an initial 'v0.0.0' version number tag
+function init
+{
+  CURRENT=$(get-current-version-tag | tr -d 'v')
+
+  if [ "$CURRENT" == "none" ]; then
+    create-version-tag "inital" "0.0.0"
+    echo "Initial version: 0.0.0"
+  else
+    echo "ERROR: Repository contains a version tag already, $CURRENT."
   fi
 }
 
@@ -247,6 +277,9 @@ done
 case $1 in
     help)
     help
+    ;;
+    init)
+    init
     ;;
     show)
     show
