@@ -161,22 +161,29 @@ function set-version
   NEW_MINOR=$(echo $1 | cut -d. -f2)
   NEW_PATCH=$(echo $1 | cut -d. -f3)
 
-  if [ "$CURRENT_MAJOR" < "$NEW_MAJOR" ]; then
-    echo "OK"
-  else
-    if [ "$CURRENT_MINOR" < "$NEW_MINOR" ]; then
-      echo "OK"
-    else
-      if [ "$CURRENT_PATCH" < "$NEW_PATCH" ]; then
-        echo "OK"
-      else
-        echo "ERROR: $1 is not a monotonic increasing version number."
-        exit 1;
-      fi
-    fi
+  VERSION_OK=false
+  if [ "$NEW_MAJOR" -gt "$CURRENT_MAJOR" ]; then
+    VERSION_OK=true
   fi
 
-  echo "Create version $1"
+  if [[ "$NEW_MAJOR" -eq "$CURRENT_MAJOR"
+      && "$NEW_MINOR" -gt "$CURRENT_MINOR" ]]; then
+    VERSION_OK=true
+  fi
+
+  if [[ "$NEW_MAJOR" -eq "$CURRENT_MAJOR"
+      && "$NEW_MINOR" -eq "$CURRENT_MINOR"
+      && "$NEW_PATCH" -gt "$CURRENT_PATCH" ]]; then
+    VERSION_OK=true
+  fi
+
+  if [ "$VERSION_OK" = true ]; then
+    echo "New version: $1"
+    create-version-tag "manually defined version number" $1
+  else
+    echo "ERROR: $1 is not a monotonic increasing version number. Current is $CURRENT."
+    exit 1;
+  fi
 }
 
 ################################################################################
