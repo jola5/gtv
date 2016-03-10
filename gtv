@@ -76,8 +76,8 @@ EXAMPLES
 "
 }
 
-# get latest version tag and print its name
-function get-latest-tag-version
+# get current version tag and print its name
+function get-current-version-tag
 {
   TAG=$(git tag --list -n1 | grep -E "^v[0-9]+.[0-9]+.[0-9]+\s+version [0-9]+.[0-9]+.[0-9]+" | tail -n1 | cut -d" " -f1)
   echo "$TAG"
@@ -86,14 +86,14 @@ function get-latest-tag-version
 # print latest version number in a plain format, '1.2.3'
 function show
 {
-  TAG=$(get-latest-tag-version)
+  TAG=$(get-current-version-tag)
   echo $TAG | tr -d 'v'
 }
 
 # print a new monotonic increasing version number based on the given version string
 # argument 1: version type [major|minor|patch]
 # argument 2: current version number string "major.minor.patch"
-function new-version-string
+function monotonic-increasing-version
 {
   MAJOR=$(echo $2 | cut -d. -f1)
   MINOR=$(echo $2 | cut -d. -f2)
@@ -121,15 +121,12 @@ function new-version-string
   echo "$MAJOR.$MINOR.$PATCH"
 }
 
-# create a new (monotonic increasing) version number tag
-# argument 1: version type [major|minor|patch]
-function tag-new-version
+# create a version number tag
+# argument 1: short description
+# argument 2: version number string "major.minor.patch"
+function create-version-tag
 {
-  CURRENT=$(get-latest-tag-version | tr -d 'v' )
-  NEW=$(new-version-string $1 $CURRENT)
-  echo "Current version:   $CURRENT"
-  echo "New $1 version: $NEW"
-  git tag -a "v$NEW$SUFFIX" -m "version $NEW: new $1" -m "$MESSAGE"
+  git tag -a "v$2$SUFFIX" -m "version $2: $1" -m "$MESSAGE"
 }
 
 # create new version tag
@@ -139,7 +136,11 @@ function new
   # detect sub-command
   case $1 in
     major|minor|patch)
-    tag-new-version $1
+    CURRENT=$(get-current-version-tag | tr -d 'v')
+    NEW=$(monotonic-increasing-version $1 $CURRENT)
+    echo "Current version:   $CURRENT"
+    echo "New $1 version: $NEW"
+    create-version-tag $1 $NEW
     ;;
     *)
     echo "ERROR: Unsupported version type '$1', use major, minor or patch!"
@@ -152,7 +153,7 @@ function new
 # argument 1: version number string "major.minor.patch"
 function set-version
 {
-  CURRENT=$(get-latest-tag-version)
+  CURRENT=$(get-current-version-tag | tr -d 'v')
   CURRENT_MAJOR=$(echo $CURRENT | cut -d. -f1)
   CURRENT_MINOR=$(echo $CURRENT | cut -d. -f2)
   CURRENT_PATCH=$(echo $CURRENT | cut -d. -f3)
