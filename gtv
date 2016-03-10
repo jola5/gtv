@@ -19,11 +19,11 @@ DESCRIPTION
         A script to use git tags for repository version numbers through a simple
         CLI.
 
-        Gtv is simple script to create git tags with a semantic versioning number
-        scheme 'major.minor.patch', eg. 1.2.3. You may increase major, minor or
-        patch number versions separately, or define a complete new 'unrelated'
-        version number als long as the number to be assigned is monotonic
-        increasing.
+        Gtv is simple script to create git tags with a semantic versioning
+        number scheme 'major.minor.patch', eg. 1.2.3. You may increase major,
+        minor or patch number versions separately, or define a complete new
+        'unrelated' version number as long as the number to be assigned is
+        monotonic increasing.
 
         By using the meta data of the git scm you omit the need to change your
         reporitories contents' if the version number changes. On the other hand
@@ -32,39 +32,45 @@ DESCRIPTION
         technically possible ('v1.2.3' vs. 'V1.2.3'). However, this is not
         possible if you stay with gtv to work on your version tags.
 
-        The init command creates an initial 0.0.0 verison tag.
+        The init command creates an initial 0.0.0 version tag, use it on new
+        repositories which are not using version tags yet.
 
         Mind, assigning mulitple version tags to the same commit is possible
         by default, if you want to omit this behaviour use the strict option.
 
         If no explicit command is given gtv executes 'show'.
 
-
 COMMANDS
         help
                 Display this help text.
 
         init
-                Initially create a 'v0.0.0' version tag, to be used on new repositories.
+                Initially create a 'v0.0.0' version tag. To be used on new
+                repositories.
 
         show
                 Show current version number.
 
-        new     <major|minor|patch> [-m|--message=<message>] [-t|--tag-suffix=<suffix>]
-                [-s|--strict]
+        new     <major|minor|patch> [-m|--message=<message>]
+                [-t|--tag-suffix=<suffix>] [-s|--strict]
                 Create a new git version number tag by a simple increment to the
-                given version part major, minor or patch. Add the optional
-                message as annotated tag message. Add the optional tag suffixas
-                a suffix to the tag name itself. Do not allow assignment of
-                mulitple version tags to the same commit using 'strict'.
+                given version part major, minor or patch.
+                'gtv new major' on an existing v0.41.1  creates v1.0.0.
+                'gtv new minor' on an existing v1.2.3   creates v1.3.0.
+                'gtv new patch' on an existing v2.12.32 creates v2.12.33.
+
+                Add the optional message to annotated tags. Add the optional tag
+                suffixs as a suffix to the tag name itself. Do not allow
+                assignment of mulitple version tags to the same commit using
+                'strict'.
 
         set     <version> [-m|--message=<message>] [-t|--tag-suffix=<suffix>]
                 [-s|--strict]
                 Assign a specific git version number tag, must be increasing
-                monotonic. Add the optional message as annotated tag message.
-                Add the optional tag suffix as a suffix to the tag name itself.
-                Do not allow assignment of mulitple version tags to the same
-                commit using 'strict'.
+                monotonic. Add the optional message to annotated tags.Add the
+                optional tag suffix as a suffix to the tag name itself. Do not
+                allow assignment of mulitple version tags to the same commit
+                using 'strict'.
 
 EXAMPLES
         # show current version, eg. 1.21.3
@@ -80,8 +86,8 @@ EXAMPLES
         # create a new tag with an increased major version and message
         gtv new major -m NEW
         # shows tag v2.0.0 with message \"NEW\"
-        git show $(git describe)
-        # create a new tag with an increased major version, message and tag suffix
+        git show \$(git describe)
+        # create a new tag with an increased major version, message and suffix
         gtv new major --message=ALPHA --suffix=-alpha
         # shows tag v3.0.0-alpha with message \"ALPHA\"
         git show \$(git describe)
