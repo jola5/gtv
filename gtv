@@ -23,12 +23,15 @@ DESCRIPTION
         or define a complete new 'unrelated' version number als long as the number
         to assign is monotonic increasing.
 
-        Using the meta data of the git scm you omit the need to change your
-        reporitories contents' if the version number changes. On the othe hand
+        By using the meta data of the git scm you omit the need to change your
+        reporitories contents' if the version number changes. On the other hand
         meta data itself is not under version control, thus deleting tags or
         re-assigning tags with the same version number to different commits is
-        technically possible. However, it is not possible if you stay with gtv
+        technically possible. However, this is not possible if you stay with gtv
         to work on your version tags.
+
+        Mind, assigning mulitple version tags to the same commit is possible,
+        even with gtv.
 
         If no explicit command is given gtv executes 'show'.
 
