@@ -23,7 +23,7 @@ DESCRIPTION
         number scheme 'major.minor.patch', eg. 1.2.3. You may increase major,
         minor or patch number versions separately, or define a complete new
         'unrelated' version number as long as the number to be assigned is
-        monotonic increasing.
+        strictly increasing.
 
         By using the meta data of the git scm you omit the need to change your
         reporitories contents' if the version number changes. On the other hand
@@ -66,8 +66,8 @@ COMMANDS
 
         set     <version> [-m|--message=<message>] [-t|--tag-suffix=<suffix>]
                 [-s|--strict]
-                Assign a specific git version number tag, must be increasing
-                monotonic. Add the optional message to annotated tags.Add the
+                Assign a specific git version number tag, must be strictly
+                increasing. Add the optional message to annotated tags.Add the
                 optional tag suffix as a suffix to the tag name itself. Do not
                 allow assignment of mulitple version tags to the same commit
                 using 'strict'.
@@ -79,7 +79,7 @@ EXAMPLES
         gtv new minor
         # show current version, eg. 1.22.0
         gtv show
-        # assign an arbitrary but monotonic version number
+        # assign an arbitrary but strictly increasing version number
         gtv set 1.22.1
         # show current version is the default command, eg. 1.22.1
         gtv
@@ -91,7 +91,7 @@ EXAMPLES
         gtv new major --message=ALPHA --suffix=-alpha
         # shows tag v3.0.0-alpha with message \"ALPHA\"
         git show \$(git describe)
-        # ERROR!!! Not a monotonic increaing number
+        # ERROR!!! Not a strictly increaing number
         gtv set 1.0.0
 "
 }
@@ -115,10 +115,10 @@ function show
   echo $TAG | tr -d 'v'
 }
 
-# print a new monotonic increasing version number based on the given version string
+# print a new strictly increasing version number based on the given version string
 # argument 1: version type [major|minor|patch]
 # argument 2: current version number string "major.minor.patch"
-function monotonic-increasing-version
+function strictly-increasing-version
 {
   MAJOR=$(echo $2 | cut -d. -f1)
   MINOR=$(echo $2 | cut -d. -f2)
@@ -162,7 +162,7 @@ function new
   case $1 in
     major|minor|patch)
     CURRENT=$(get-current-version-tag | tr -d 'v')
-    NEW=$(monotonic-increasing-version $1 $CURRENT)
+    NEW=$(strictly-increasing-version $1 $CURRENT)
     echo "Current version:   $CURRENT"
     echo "New $1 version: $NEW"
     create-version-tag $1 $NEW
@@ -212,7 +212,7 @@ function set-version
     echo "New version: $1"
     create-version-tag "manually defined version number" $1
   else
-    echo "ERROR: $1 is not a monotonic increasing version number. Current is $CURRENT."
+    echo "ERROR: $1 is not a strictly increasing version number. Current is $CURRENT."
     exit 1;
   fi
 }
