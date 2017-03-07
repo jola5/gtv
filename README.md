@@ -1,6 +1,6 @@
 # Git Tag Version
 
-This is a script to enable simple versioning of git repositories based on tags following the **semantic versioning** scheme,  http://semver.org/. This is  **major.minor.patch**, eg. `1.0.21`.
+This is a script to enable simple versioning of git repositories based on tags following the [semantic versioning](http://semver.org/) scheme: **major.minor.patch**, eg. `1.0.21`.
 
 Only the SCMs meta data is used to store the version information. No change is made to the repository contents if the version changes. If you bump the version, your **commit does not change**.
 This may or may not be what you are looking for.
