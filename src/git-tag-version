@@ -224,7 +224,7 @@ function init
   CURRENT=$(get-current-version-tag | tr -d 'v')
 
   if [ "$CURRENT" == "none" ]; then
-    create-version-tag "inital" "0.0.0"
+    create-version-tag "initial" "0.0.0"
     echo "Initial version: 0.0.0"
   else
     echo "ERROR: Repository contains a version tag already, $CURRENT."
