@@ -31,16 +31,20 @@ function cmd_tag {
   ${GTV} new patch --strict
 }
 
-# build the gtv release artifact, expects version string number as first argument
+# build the gtv release artifact, expects version string number as first argument, auto generates it otherwise
 function cmd_build {
   echo -e "\n## Building artifact"
   mkdir -p ${WORKSPACE}/build
   cp -f ${WORKSPACE}/src/git-tag-version ${WORKSPACE}/build/
 
   if [ -n "$1" ]; then
-    sed -e "s/^\(GTV_VERSION=\).*$/\1\"$1\"/g" -i ${WORKSPACE}/build/git-tag-version
+    VERSION=$1
+  else
+    SUFFIX="${TRAVIS_BUILD_NUMBER:-local}"
+    VERSION="$(bash ${WORKSPACE}/src/git-tag-version)-${SUFFIX}"
   fi
-  echo "Version $1"
+  sed -e "s/^\(GTV_VERSION=\).*$/\1\"$VERSION\"/g" -i ${WORKSPACE}/build/git-tag-version
+  echo "Version $VERSION"
   echo "Provided at ${WORKSPACE}/build/git-tag-version"
 }
 
@@ -61,6 +65,5 @@ case "$1" in
     cmd_test
     # cmd_tag
     cmd_build $1
-    exit 1
     ;;
 esac
