@@ -3,25 +3,28 @@
 # git tag version
 # A script to use git tags for repository version numbers through a simple CLI
 
+# proper version information is assigned during build
+GTV_VERSION="UNRELEASED"
+
 ################################################################################
 
 # display help
 function help
 {
   echo "NAME
-        gtv - git tag version
+        git-tag-version
 
 SYNOPSIS
-        gtv [command] [-m|--message=<message>] [-t|--tag-suffix=<suffix>]
+        git-tag-version [command] [-m|--message=<message>] [-t|--tag-suffix=<suffix>]
             [-s|--strict]
 
 DESCRIPTION
         A script to use git tags for repository version numbers through a simple
         CLI.
 
-        Gtv is simple script to create git tags with a semantic versioning
-        number scheme 'major.minor.patch', eg. 1.2.3. You may increase major,
-        minor or patch number versions separately, or define a complete new
+        git-tag-version (gtv) is simple script to create git tags with a semantic
+        versioning number scheme 'major.minor.patch', eg. 1.2.3. You may increase
+        major, minor or patch number versions separately, or define a complete new
         'unrelated' version number as long as the number to be assigned is
         strictly increasing.
 
@@ -51,6 +54,9 @@ COMMANDS
         show
                 Show current version number.
 
+        version
+                Show version information of git-tag-version.
+
         new     <major|minor|patch> [-m|--message=<message>]
                 [-t|--tag-suffix=<suffix>] [-s|--strict]
                 Create a new git version number tag by a simple increment to the
@@ -67,7 +73,7 @@ COMMANDS
         set     <version> [-m|--message=<message>] [-t|--tag-suffix=<suffix>]
                 [-s|--strict]
                 Assign a specific git version number tag, must be strictly
-                increasing. Add the optional message to annotated tags.Add the
+                increasing. Add the optional message to annotated tags. Add the
                 optional tag suffix as a suffix to the tag name itself. Do not
                 allow assignment of mulitple version tags to the same commit
                 using 'strict'.
@@ -96,6 +102,12 @@ EXAMPLES
 "
 }
 
+# show version
+function version
+{
+  echo "git-tag-version version \"$GTV_VERSION\""
+}
+
 # get current version tag and print its name, return 'none' if no version tag exists
 function get-current-version-tag
 {
@@ -114,6 +126,10 @@ function show
 {
   TAG=$(get-current-version-tag)
   echo $TAG | tr -d 'v'
+
+  if [ "$TAG" = "none" ]; then
+    exit 1
+  fi
 }
 
 # print a new strictly increasing version number based on the given version string
@@ -290,6 +306,9 @@ case $1 in
     ;;
     show)
     show
+    ;;
+    version)
+    version
     ;;
     new)
     new $2
