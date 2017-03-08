@@ -51,3 +51,23 @@ git show $(git describe)
 # ERROR!!! Not a strictly increaing number
 gtv set 1.0.0
 ```
+
+## Development
+
+### Build
+
+Since gtv is a plain shell script there is no original *build step*. Except we are including the version number within the released gtv artifact.
+
+Create a gtv release artifact with this neat recursive solution:
+
+```bash
+make.sh build $(git-tag-version)
+```
+
+### Test
+
+You can execute the tests with [Bash Automated Testing System](https://github.com/sstephenson/bats):
+
+``` bash
+make.sh test
+```
