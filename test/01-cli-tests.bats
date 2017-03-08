@@ -13,6 +13,10 @@ function setup {
   cd $TEST_DIR
 
   git init
+  # we need to provide a basic git configuration - on travis there is none
+  git config user.email "noreply@travis-ci.org"
+  git config user.name "travis build git user"
+
   date > file
   git add .
   git commit -m "initial"
