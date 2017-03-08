@@ -1,5 +1,7 @@
 # Git Tag Version
 
+[![Build Status](https://travis-ci.org/jola5/gtv.svg?branch=master)](https://travis-ci.org/jola5/gtv)
+
 This is a script to enable simple versioning of git repositories based on tags following the [semantic versioning](http://semver.org/) scheme: **major.minor.patch**, eg. `1.0.21`.
 
 Only the SCMs meta data is used to store the version information. No change is made to the repository contents if the version changes. If you bump the version, your **commit does not change**.
