@@ -42,7 +42,7 @@ function help
 
 SYNOPSIS
         git-tag-version [command] [-m|--message=<message>] [-t|--tag-suffix=<suffix>]
-            [-s|--strict]
+            [-s|--strict] [-n|--non-strict]
 
 DESCRIPTION
         A script to use git tags for repository version numbers through a simple
@@ -65,7 +65,15 @@ DESCRIPTION
         repositories which are not using version tags yet.
 
         Mind, assigning mulitple version tags to the same commit is possible
-        by default, if you want to omit this behaviour use the strict option.
+        by default, if you want to omit this behaviour use the strict-mode option.
+        You can enable this strict-mode at all times by utilizing your git
+        configuration like this 'git config gtv.strict-mode true'. You can
+        temporarily disable strict-mode again by using the non-strict
+        command line option. The appropriate git configuration value is nothing
+        or 'git config gtv.strict-mode anything-but-true'. Since this is a plain
+        git configuration it behaves absolutely the same, so pay attention if you
+        use this setting on your local or gobal git configuration.
+        See 'git help config' for details.
 
         If no explicit command is given gtv executes 'show'.
 
@@ -85,6 +93,7 @@ COMMANDS
 
         new     <major|minor|patch> [-m|--message=<message>]
                 [-t|--tag-suffix=<suffix>] [-s|--strict]
+                [-n|--non-strict]
                 Create a new git version number tag by a simple increment to the
                 given version part major, minor or patch.
                 'gtv new major' on an existing v0.41.1  creates v1.0.0.
@@ -97,7 +106,7 @@ COMMANDS
                 'strict'.
 
         set     <version> [-m|--message=<message>] [-t|--tag-suffix=<suffix>]
-                [-s|--strict]
+                [-s|--strict] [-n|--non-strict]
                 Assign a specific git version number tag, must be strictly
                 increasing. Add the optional message to annotated tags. Add the
                 optional tag suffix as a suffix to the tag name itself. Do not
@@ -312,10 +321,10 @@ function init
 # defaults for the optional arguments
 MESSAGE=""
 SUFFIX=""
-STRICT=false
+STRICT=$(git config gtv.strict-mode)
 
 # get the optional arguments
-ARGS=$(getopt -o m:st: -l "message:,strict,tag-suffix:" -n "getopt.sh" -- "$@");
+ARGS=$(getopt -o m:nst: -l "message:,non-strict,strict,tag-suffix:" -n "getopt.sh" -- "$@");
 
 #Bad arguments
 if [ $? -ne 0 ];
@@ -327,6 +336,10 @@ eval set -- "$ARGS";
 
 while true; do
   case "$1" in
+    -n|--non-strict)
+      STRICT=false
+      shift;
+      ;;
     -m|--message)
       shift;
       if [ -n "$1" ]; then

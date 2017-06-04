@@ -86,35 +86,3 @@ function teardown {
   echo "status: $status"
   [ "$status" = 1 ]
 }
-
-@test "create new patch version on existing tag with strict mode fails" {
-  run ${GTV} init
-  run ${GTV} set 1.0.0
-  run ${GTV} --strict new patch
-  echo "status: $status"
-  [ "$status" = 1 ]
-}
-
-@test "create new minor version on existing tag with strict mode fails" {
-  run ${GTV} init
-  run ${GTV} set 1.0.0
-  run ${GTV} --strict new minor
-  echo "status: $status"
-  [ "$status" = 1 ]
-}
-
-@test "create new major version on existing tag with strict mode fails" {
-  run ${GTV} init
-  run ${GTV} set 1.0.0
-  run ${GTV} --strict new major
-  echo "status: $status"
-  [ "$status" = 1 ]
-}
-
-@test "set specific version on existing tag with strict mode fails" {
-  run ${GTV} init
-  run ${GTV} set 1.0.0
-  run ${GTV} --strict set 1.2.3
-  echo "status: $status"
-  [ "$status" = 1 ]
-}

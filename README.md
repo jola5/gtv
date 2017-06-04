@@ -76,6 +76,14 @@ This gives you these advantages:
 1. Gtv is available for all users on your machine
 1. You can access gtv by calling `gtv` directly or via the git alias `git tag-version`
 
+## Configuration
+
+We utilize the git configuration capabilities themselves for our gtv configuration. So pay attention if you
+use this setting on your local or gobal git config.
+
+Mind, assigning mulitple version tags to the same commit is possible by default, if you want to omit this behaviour use the strict-mode option. You can enable this strict-mode at all times by utilizing your git
+configuration like this `git config gtv.strict-mode true`. You can temporarily disable strict-mode again by using the non-strict command line option. The appropriate git configuration value is nothing or `git config gtv.strict-mode anything-but-true`. See `git help config` for details.
+
 ## Development
 
 ### Build
