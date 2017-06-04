@@ -161,7 +161,6 @@ function version
 # get current version tag and print its name, return 'none' if no version tag exists
 function get-current-version-tag
 {
-  # TODO: regex needs fixing for --tag-suffix
   TAG=$(git tag --list -n1 | grep -E "^v[0-9]+.[0-9]+.[0-9]+.*\s+version [0-9]+.[0-9]+.[0-9]+" | tail -n1 | cut -d" " -f1)
 
   if [ -z "$TAG" ]; then
