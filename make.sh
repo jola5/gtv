@@ -4,8 +4,9 @@ set -e
 
 WORKSPACE=$(dirname $(readlink -f $0))
 GTV=${WORKSPACE}/src/git-tag-version
-TEST_RESULTS=${WORKSPACE}/build/test.results
-
+BUILD_DIR=${WORKSPACE}/build
+TEST_DIR=${WORKSPACE}/test
+TEST_RESULTS=${BUILD_DIR}/test.results
 cd ${WORKSPACE}
 
 function cmd_help {
@@ -15,16 +16,23 @@ COMMAND
   help    print this help text
   test    run tests, returns 0 on success, test results in \"TEST_RESULTS\"
   tag     create a new patch version (with strict mode)
-  build   create a release artifact in \"${WORKSPACE}/build/git-tag-version\"
+  build   create a release artifact in \"${BUILD_DIR}/git-tag-version\"
 "
+}
+
+function cmd_clean {
+  echo -e "\n## Cleaning up"
+  rm -rfv ${BUILD_DIR}
 }
 
 function cmd_test {
   echo -e "\n## Executing tests"
+  mkdir -p ${WORKSPACE}/build
   # make bats available and execute tests
   git clone https://github.com/sstephenson/bats.git &> /dev/null || : # do not abort if clone exists
   PATH=$PATH:${WORKSPACE}/bats/bin
-  env GTV="${GTV}" bats ${WORKSPACE}/test/*.bats | tee ${TEST_RESULTS}
+  date > ${TEST_RESULTS}
+  env GTV="${GTV}" bats ${TEST_DIR}/*.bats | tee ${TEST_RESULTS}
   echo "Test results saved to ${TEST_RESULTS}"
 }
 
@@ -37,7 +45,7 @@ function cmd_tag {
 function cmd_build {
   echo -e "\n## Building artifact"
   mkdir -p ${WORKSPACE}/build
-  cp -f ${WORKSPACE}/src/git-tag-version ${WORKSPACE}/build/
+  cp -f ${WORKSPACE}/src/git-tag-version ${BUILD_DIR}/
 
   if [ -n "$1" ]; then
     VERSION=$1
@@ -45,12 +53,15 @@ function cmd_build {
     SUFFIX="${TRAVIS_BUILD_NUMBER:-local}"
     VERSION="$(bash ${WORKSPACE}/src/git-tag-version)-${SUFFIX}"
   fi
-  sed -e "s/^\(GTV_VERSION=\).*$/\1\"$VERSION\"/g" -i ${WORKSPACE}/build/git-tag-version
+  sed -e "s/^\(GTV_VERSION=\).*$/\1\"$VERSION\"/g" -i ${BUILD_DIR}/git-tag-version
   echo "Version $VERSION"
-  echo "Provided at ${WORKSPACE}/build/git-tag-version"
+  echo "Provided at ${BUILD_DIR}/git-tag-version"
 }
 
 case "$1" in
+  "clean")
+    cmd_clean
+    ;;
   "test")
     cmd_test
     ;;
@@ -64,8 +75,8 @@ case "$1" in
     cmd_help
     ;;
   *)
+    cmd_clean
     cmd_test
-    # cmd_tag
-    cmd_build $1
+    cmd_build $2
     ;;
 esac
