@@ -39,7 +39,10 @@ function cmd_test {
 function cmd_validate {
   echo -e "\n## Validating files"
   bash -n ${GTV}
-  travis lint ${WORKSPACE}/.travis.yml
+  # only validate travis file if not on travis
+  if [ -z "${TRAVIS_BUILD_NUMBER}" ]; then
+    travis lint ${WORKSPACE}/.travis.yml
+  fi
 }
 
 function cmd_tag {
