@@ -54,6 +54,28 @@ git show $(git describe)
 gtv set 1.0.0
 ```
 
+## Installation
+
+For the impatient:
+
+```bash
+curl -sL https://raw.githubusercontent.com/jola5/gtv/master/install.sh | sudo bash -
+```
+
+Since gtv is a plain shell script you can literally put it wherever you want and execute it as you would any other script. But putting gtv with the right name in the right place simplifies usage a lot. The installation script above performs these steps:
+
+```bash
+# probably needs root privileges
+cd /usr/local/bin/
+curl -sL $(curl -s https://api.github.com/repos/jola5/gtv/releases | grep browser_download_url | head -n 1 | cut -d '"' -f 4) --output git-tag-version
+chmod +x git-tag-version
+ln -s git-tag-version gtv
+```
+
+This gives you these advantages:
+1. Gtv is available for all users on your machine
+1. You can access gtv by calling `gtv` directly or via the git alias `git tag-version`
+
 ## Development
 
 ### Build
