@@ -1,4 +1,12 @@
 language: bash
-
 script:
-    - ./make.sh
+- "./make.sh"
+deploy:
+  provider: releases
+  api_key:
+    secure: VMZzgqGAvY5LcZSY2fymkh0mqRDoQi/aImsb0ZkBDEqf5NMocb3ZBEhLCOyu2yehDCTuWPHy4Px5xotgyC/H0Jnf6rJM4KCuyyqisIwER4H+qY56ujOw9ZvUFRr4sHLS/hd/B7m9OHpub/QeOHw01+0dlcxPB5n0qs4Fr3vYMeiKfCZ+grmk4BG0w7yeKiIJOy3KiZbfGDOjCeQSZYj3zezvoDjsd1Ygf2bI+heI3aWL+dpVitLbhvM10zRCkBa2Yv/AQGm+iUqI3EydP0VCVi4x/rVaB2UDyVQF7dBIABtYgWUzmBLACRZZhBOxbyr+TF92sffW4AaYHIZTizmxrgOnye7LglG0lnNO76K4/cCimLheqWkz2V6gTiPJhQnz5AtzCjrWKBwgRF489ECXsf+T5sfR/FE0ym34F3tDMUNNnf2grHNStY7FeHHtDjZm+Qls8qAkcTSEFJ/Q8JqIOOcNv+bEsGAijYKKfbTc/PaBmddECeQkYVaB+6LmiM/ILsSEqwhDkPH/nXskO5piMcz78kDL12f2UI24T/8OM8s8SIVgAbEbxYYEkJz99pBdBx+ThdbqcdphLZvowrKDzCh9XlRqiJub03zfABqp8ga+PpXx5mVUuqw+ax+oRILOAoja5jvAdKrmt/Hr002THf8tR49Tn40I445V8CQKprE=
+  file: "./build/git-tag-version"
+  skip_cleanup: true
+  on:
+    branch: master
+    repo: jola5/gtv
