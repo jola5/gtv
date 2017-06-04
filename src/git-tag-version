@@ -41,7 +41,7 @@ function help
         git-tag-version
 
 SYNOPSIS
-        git-tag-version [command] [-m|--message=<message>] [-t|--tag-suffix=<suffix>]
+        git-tag-version [command] [-m|--message=<message>] [-x|--suffix=<suffix>]
             [-s|--strict] [-n|--non-strict]
 
 DESCRIPTION
@@ -61,11 +61,26 @@ DESCRIPTION
         technically possible ('v1.2.3' vs. 'V1.2.3'). However, this is not
         possible if you stay with gtv to work on your version tags.
 
-        The init command creates an initial 0.0.0 version tag, use it on new
+        The init command creates an initial 0.0.0 version tag. Use it on new
         repositories which are not using version tags yet.
 
+        Do not get confused by the tag name and the version. Both are heavily
+        related but not the same. But it is simple, the tag name equals the
+        tag version prepended by a lower case letter v, like this:
+          Tag Version:  1.2.45
+          Tag Name:    v1.2.45
+
+        You can apply a suffix to the tag version number. The given suffix is
+        append to the tag version number after a additional dash like this:
+          v0.1.9-MySuperSuffix
+        Mind, gtv does support adding suffixes to tag names but does not interpret
+        or derive meaning from suffixes. If you create a new patch version on a tag
+        named 'v0.99.1-ALPHA' it will drop the suffix and simply perform the
+        intended action, resulting in an new tag named 'v0.99.2'.
+        For gtv there is no meaning in suffixes like 'alpha', 'beta', 'RC1' etc.
+
         Mind, assigning mulitple version tags to the same commit is possible
-        by default, if you want to omit this behaviour use the strict-mode option.
+        by default. If you want to omit this behaviour use the strict-mode option.
         You can enable this strict-mode at all times by utilizing your git
         configuration like this 'git config gtv.strict-mode true'. You can
         temporarily disable strict-mode again by using the non-strict
@@ -92,7 +107,7 @@ COMMANDS
                 Show version information of git-tag-version.
 
         new     <major|minor|patch> [-m|--message=<message>]
-                [-t|--tag-suffix=<suffix>] [-s|--strict]
+                [-x|--suffix=<suffix>] [-s|--strict]
                 [-n|--non-strict]
                 Create a new git version number tag by a simple increment to the
                 given version part major, minor or patch.
@@ -105,7 +120,7 @@ COMMANDS
                 assignment of mulitple version tags to the same commit using
                 'strict'.
 
-        set     <version> [-m|--message=<message>] [-t|--tag-suffix=<suffix>]
+        set     <version> [-m|--message=<message>] [-x|--suffix=<suffix>]
                 [-s|--strict] [-n|--non-strict]
                 Assign a specific git version number tag, must be strictly
                 increasing. Add the optional message to annotated tags. Add the
@@ -147,7 +162,7 @@ function version
 function get-current-version-tag
 {
   # TODO: regex needs fixing for --tag-suffix
-  TAG=$(git tag --list -n1 | grep -E "^v[0-9]+.[0-9]+.[0-9]+\s+version [0-9]+.[0-9]+.[0-9]+" | tail -n1 | cut -d" " -f1)
+  TAG=$(git tag --list -n1 | grep -E "^v[0-9]+.[0-9]+.[0-9]+.*\s+version [0-9]+.[0-9]+.[0-9]+" | tail -n1 | cut -d" " -f1)
 
   if [ -z "$TAG" ]; then
     TAG="none"
@@ -206,7 +221,7 @@ function create-version-tag
   if [ "$STRICT" = true ]; then
     ensure-strict-mode
   fi
-  git tag -a "v$2$SUFFIX" -m "version $2: $1" -m "$MESSAGE"
+  git tag -a "v$2${SUFFIX}" -m "version $2: $1" -m "${MESSAGE}"
 }
 
 # create new version tag
@@ -232,7 +247,7 @@ function new-version
 # check if the given string is a gtv style tag
 # argument 1: the tag string to be checked
 function is-gtv-tag {
-  if [[ "$1" =~ ^v[0-9]+\.[0-9]+\.[0-9]+.*$ ]]; then
+  if [[ "$1" =~ ^v[0-9]+\.[0-9]+\.[0-9]+[^a-zA-Z]?.*$ ]]; then
     return 0
   else
     return 1
@@ -321,10 +336,13 @@ function init
 # defaults for the optional arguments
 MESSAGE=""
 SUFFIX=""
+SUFFIX_DELIMITER=$(git config gtv.suffix-delimiter)
+SUFFIX_DELIMITER=${SUFFIX_DELIMITER:--}
 STRICT=$(git config gtv.strict-mode)
+STRICT=${STRICT:-false}
 
 # get the optional arguments
-ARGS=$(getopt -o m:nst: -l "message:,non-strict,strict,tag-suffix:" -n "getopt.sh" -- "$@");
+ARGS=$(getopt -o m:nsx: -l "message:,non-strict,strict,suffix:" -n "getopt.sh" -- "$@");
 
 #Bad arguments
 if [ $? -ne 0 ];
@@ -351,10 +369,10 @@ while true; do
       STRICT=true
       shift;
       ;;
-    -t|--tag-suffix)
+    -x|--suffix)
       shift;
       if [ -n "$1" ]; then
-        SUFFIX=$1
+        SUFFIX="${SUFFIX_DELIMITER}$1"
         shift;
       fi
       ;;
