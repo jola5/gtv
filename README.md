@@ -47,7 +47,7 @@ gtv new major -m "new version description message"
 # shows tag v2.0.0 with message "NEW"
 git show $(git describe)
 # create a new tag with an increased major version, message and suffix
-gtv new major --message=ALPHA --suffix=-alpha
+gtv new major --message=ALPHA --suffix=alpha
 # shows tag v3.0.0-alpha with message "ALPHA"
 git show $(git describe)
 # ERROR!!! Not a strictly increaing number
@@ -92,7 +92,7 @@ For general usage information on the git configuration see `git help config`.
 Assigning mulitple version tags to the same commit is possible by default, if you want to omit this behaviour use the `strict-mode` option. You can enable this strict-mode at all times by utilizing your git configuration like this `git config gtv.strict-mode true`. You can temporarily disable strict-mode again by using the `non-strict` option. The appropriate git configuration value is nothing or `git config gtv.strict-mode anything-but-true`.
 
 ### suffix-delimiter
-You can change the suffix delimiter that is `v1.1.1<SUFFIX-DELIMITER><SUFFIX>` only by using the configuration option. Mind, the appropriate values are restricted by the git tag command since a tag needs to follow the reference name rule. Refer to `git check-ref-format` for details. 
+You can change the suffix delimiter that is `v1.1.1<SUFFIX-DELIMITER><SUFFIX>` only by using the configuration option. Mind, the appropriate values are restricted by the git tag command since a tag needs to follow the reference name rule. Refer to `git check-ref-format` for details.
 
 ## Development
 

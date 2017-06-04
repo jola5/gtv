@@ -144,7 +144,7 @@ EXAMPLES
         # shows tag v2.0.0 with message \"NEW\"
         git show \$(git describe)
         # create a new tag with an increased major version, message and suffix
-        gtv new major --message=ALPHA --tag-suffix=-alpha
+        gtv new major --message=ALPHA --tag-suffix=alpha
         # shows tag v3.0.0-alpha with message \"ALPHA\"
         git show \$(git describe)
         # ERROR!!! Not a strictly increaing number
