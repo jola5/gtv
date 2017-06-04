@@ -168,12 +168,15 @@ function strictly-increasing-version
 # argument 2: version number string "major.minor.patch"
 function create-version-tag
 {
+  if [ "$STRICT" = true ]; then
+    ensure-strict-mode
+  fi
   git tag -a "v$2$SUFFIX" -m "version $2: $1" -m "$MESSAGE"
 }
 
 # create new version tag
 # argument 1: version type [major|minor|patch]
-function new
+function new-version
 {
   # detect sub-command
   case $1 in
@@ -191,10 +194,41 @@ function new
   esac
 }
 
+# check if the given string is a gtv style tag
+# argument 1: the tag string to be checked
+function is-gtv-tag {
+  if [[ "$1" =~ ^v[0-9]+\.[0-9]+\.[0-9]+.*$ ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+# fail if there is a gtv specific version tag on the current commit
+function ensure-strict-mode {
+  GTVTAGEXISTS=false
+  for tag in $(git tag --list --contain $(git rev-parse HEAD)); do
+    echo "checking $tag"
+    if is-gtv-tag $tag; then
+      echo "ERROR: Using strict mode yet there is a version tag on this commit: $tag"
+      GTVTAGEXISTS=true
+    fi
+  done
+
+  if [ "$GTVTAGEXISTS" = true ]; then
+    exit 1
+  fi
+}
+
 # set specific version tag
 # argument 1: version number string "major.minor.patch"
 function set-version
 {
+  if ! is-gtv-tag "v$1"; then
+    echo "ERROR: '$1' is not a valid git tag version"
+    exit 1
+  fi
+
   CURRENT=$(get-current-version-tag | tr -d 'v')
 
   VERSION_OK=false
@@ -275,10 +309,6 @@ while true; do
       fi
       ;;
     -s|--strict)
-      # TODO strict is Unsupported
-      echo "ERROR: strict option is currently not supported."
-      exit 1
-
       STRICT=true
       shift;
       ;;
@@ -311,7 +341,7 @@ case $1 in
     version
     ;;
     new)
-    new $2
+    new-version $2
     ;;
     set)
     set-version $2

@@ -30,13 +30,13 @@ function teardown {
   ${GTV} help
 }
 
-@test "show uninitialized" {
+@test "show gtv information on uninitialized git repository" {
   run ${GTV} show
   [ "$status" -eq 1 ]
   [ "$output" = "none" ]
 }
 
-@test "initialize new git repository" {
+@test "initialize gtv on uninitialized git repository" {
   run ${GTV} init
   echo "status: $status"
   echo "output: $output"
@@ -71,10 +71,50 @@ function teardown {
   [ "$output" = "1.2.3" ]
 }
 
-@test "set new and invalid specific version fails" {
+@test "set semantically invalid specific version fails" {
   run ${GTV} init
   run ${GTV} set 1.2.3
   run ${GTV} set 1.0.0
+  echo "status: $status"
+  [ "$status" = 1 ]
+}
+
+@test "set syntactically invalid specific version fails" {
+  run ${GTV} init
+  run ${GTV} set 1.2.3
+  run ${GTV} set a.b3tete.te
+  echo "status: $status"
+  [ "$status" = 1 ]
+}
+
+@test "create new patch version on existing tag with strict mode fails" {
+  run ${GTV} init
+  run ${GTV} set 1.0.0
+  run ${GTV} --strict new patch
+  echo "status: $status"
+  [ "$status" = 1 ]
+}
+
+@test "create new minor version on existing tag with strict mode fails" {
+  run ${GTV} init
+  run ${GTV} set 1.0.0
+  run ${GTV} --strict new minor
+  echo "status: $status"
+  [ "$status" = 1 ]
+}
+
+@test "create new major version on existing tag with strict mode fails" {
+  run ${GTV} init
+  run ${GTV} set 1.0.0
+  run ${GTV} --strict new major
+  echo "status: $status"
+  [ "$status" = 1 ]
+}
+
+@test "set specific version on existing tag with strict mode fails" {
+  run ${GTV} init
+  run ${GTV} set 1.0.0
+  run ${GTV} --strict set 1.2.3
   echo "status: $status"
   [ "$status" = 1 ]
 }

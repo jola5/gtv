@@ -4,6 +4,7 @@ set -e
 
 WORKSPACE=$(dirname $(readlink -f $0))
 GTV=${WORKSPACE}/src/git-tag-version
+TEST_RESULTS=${WORKSPACE}/build/test.results
 
 cd ${WORKSPACE}
 
@@ -12,8 +13,8 @@ function cmd_help {
 
 COMMAND
   help    print this help text
-  test    run tests, returns 0 on success, test results in \"${WORKSPACE}/build/test.results\"
-  tag     create a new patch version (TODO: preferably strict mode)
+  test    run tests, returns 0 on success, test results in \"TEST_RESULTS\"
+  tag     create a new patch version (with strict mode)
   build   create a release artifact in \"${WORKSPACE}/build/git-tag-version\"
 "
 }
@@ -23,7 +24,8 @@ function cmd_test {
   # make bats available and execute tests
   git clone https://github.com/sstephenson/bats.git &> /dev/null || : # do not abort if clone exists
   PATH=$PATH:${WORKSPACE}/bats/bin
-  env GTV="${GTV}" bats ${WORKSPACE}/test/*.bats
+  env GTV="${GTV}" bats ${WORKSPACE}/test/*.bats | tee ${TEST_RESULTS}
+  echo "Test results saved to ${TEST_RESULTS}"
 }
 
 function cmd_tag {
