@@ -8,5 +8,6 @@ deploy:
   file: "./build/git-tag-version"
   skip_cleanup: true
   on:
-    branch: master
     repo: jola5/gtv
+    branch: master
+    tags: true

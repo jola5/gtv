@@ -36,6 +36,11 @@ function cmd_test {
   echo "Test results saved to ${TEST_RESULTS}"
 }
 
+function cmd_validate_travis {
+  echo -e "\n## Validating travis build file"
+  travis lint ${WORKSPACE}/.travis.yml
+}
+
 function cmd_tag {
   echo -e "\n## Tagging version"
   ${GTV} new patch --strict
@@ -64,6 +69,7 @@ case "$1" in
     ;;
   "test")
     cmd_test
+    cmd_validate_travis
     ;;
   "tag")
     cmd_tag
