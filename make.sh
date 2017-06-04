@@ -15,7 +15,7 @@ function cmd_help {
 COMMAND
   help    print this help text
   test    run tests, returns 0 on success, test results in \"TEST_RESULTS\"
-  tag     create a new patch version (with strict mode)
+  tag     create a new patch version
   build   create a release artifact in \"${BUILD_DIR}/git-tag-version\"
 "
 }
@@ -36,8 +36,9 @@ function cmd_test {
   echo "Test results saved to ${TEST_RESULTS}"
 }
 
-function cmd_validate_travis {
-  echo -e "\n## Validating travis build file"
+function cmd_validate {
+  echo -e "\n## Validating files"
+  bash -n ${GTV}
   travis lint ${WORKSPACE}/.travis.yml
 }
 
@@ -55,8 +56,7 @@ function cmd_build {
   if [ -n "$1" ]; then
     VERSION=$1
   else
-    SUFFIX="${TRAVIS_BUILD_NUMBER:-local}"
-    VERSION="$(bash ${WORKSPACE}/src/git-tag-version)-${SUFFIX}"
+    VERSION="$(bash ${WORKSPACE}/src/git-tag-version)"
   fi
   sed -e "s/^\(GTV_VERSION=\).*$/\1\"$VERSION\"/g" -i ${BUILD_DIR}/git-tag-version
   echo "Version $VERSION"
@@ -67,9 +67,11 @@ case "$1" in
   "clean")
     cmd_clean
     ;;
+  "validate")
+    cmd_validate
+    ;;
   "test")
     cmd_test
-    cmd_validate_travis
     ;;
   "tag")
     cmd_tag
@@ -82,6 +84,7 @@ case "$1" in
     ;;
   *)
     cmd_clean
+    cmd_validate
     cmd_test
     cmd_build $2
     ;;

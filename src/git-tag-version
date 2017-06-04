@@ -327,23 +327,23 @@ while true; do
 done
 
 # call the commands
-case $1 in
-    help)
+case "$1" in
+    "help")
     help
     ;;
-    init)
+    "init")
     init
     ;;
-    show)
+    "show")
     show
     ;;
-    version)
+    "version")
     version
     ;;
-    new)
+    "new")
     new-version $2
     ;;
-    set)
+    "set")
     set-version $2
     ;;
     *)
