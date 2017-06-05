@@ -2,12 +2,12 @@
 
 [![Build Status](https://travis-ci.org/jola5/gtv.svg?branch=master)](https://travis-ci.org/jola5/gtv)
 
-This is a script to enable simple versioning of git repositories based on tags following the [semantic versioning](http://semver.org/) scheme: **major.minor.patch**, eg. `1.0.21`.
+This is a script to enable simple versioning of git repositories based on tags following the [semantic versioning](http://semver.org/) scheme: **major.minor.patch**, eg. `1.0.21`. Git tags by default are agnostic to any semantics, see [Git-Basics-Tagging](https://git-scm.com/book/en/v2/Git-Basics-Tagging). Therefore, this script's only purpose is to ease and enforce proper usage of the **semantic versioning scheme**.
 
 Only the SCMs meta data is used to store the version information. No change is made to the repository contents if the version changes. If you bump the version, your **commit does not change**.
 This may or may not be what you are looking for.
 
-Mind: This script may create new versions by adding git tags **but it does not push**! Remember to use ```git push --tags``` to push your locally created tags to your remote repository.
+Mind: This script may create new versions by adding git tags as you wolud by using `git tag` directly, hence it does not push! Remember to use `git push --tags` to push your locally created tags to your remote repository.
 
 ## Use Cases
 
