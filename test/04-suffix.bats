@@ -103,3 +103,14 @@ function teardown {
   run ${GTV} show
   [ "$output" = "1.2.3${DELIMITER}${SUFFIX}" ]
 }
+
+@test "set new specific version that differs in suffix only" {
+  SUFFIX=wohooSuffix
+  DELIMITER='+'
+  git config gtv.suffix-delimiter ${DELIMITER}
+  run ${GTV} init
+  run ${GTV} set 1.2.3
+  run ${GTV} set 1.2.3 --suffix=${SUFFIX} --non-strict
+  run ${GTV} show
+  [ "$output" = "1.2.3${DELIMITER}${SUFFIX}" ]
+}

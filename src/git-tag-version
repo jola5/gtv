@@ -71,13 +71,16 @@ DESCRIPTION
           Tag Name:    v1.2.45
 
         You can apply a suffix to the tag version number. The given suffix is
-        append to the tag version number after a additional dash like this:
+        appended to the tag version number after an additional dash like this:
           v0.1.9-MySuperSuffix
         Mind, gtv does support adding suffixes to tag names but does not interpret
         or derive meaning from suffixes. If you create a new patch version on a tag
         named 'v0.99.1-ALPHA' it will drop the suffix and simply perform the
         intended action, resulting in an new tag named 'v0.99.2'.
         For gtv there is no meaning in suffixes like 'alpha', 'beta', 'RC1' etc.
+        If you assign multiple tag versions to the same commit by non-strict mode
+        the version reported by 'gtv show' is the last version that is reported by
+        'git tag --list'. This may or may not be what is expected. 
 
         Mind, assigning mulitple version tags to the same commit is possible
         by default. If you want to omit this behaviour use the strict-mode option.
@@ -278,6 +281,8 @@ function set-version
     exit 1
   fi
 
+  NEW_VERSION=$1${SUFFIX}
+
   CURRENT=$(get-current-version-tag | tr -d 'v')
 
   VERSION_OK=false
@@ -286,12 +291,14 @@ function set-version
     CURRENT="0.0.0"
   fi
 
-  CURRENT_MAJOR=$(echo $CURRENT | cut -d. -f1)
-  CURRENT_MINOR=$(echo $CURRENT | cut -d. -f2)
-  CURRENT_PATCH=$(echo $CURRENT | cut -d. -f3)
-  NEW_MAJOR=$(echo $1 | cut -d. -f1)
-  NEW_MINOR=$(echo $1 | cut -d. -f2)
-  NEW_PATCH=$(echo $1 | cut -d. -f3)
+  CURRENT_MAJOR=$(echo $CURRENT | grep -oE '([0-9]+\.){2}[0-9]+' | cut -d. -f1)
+  CURRENT_MINOR=$(echo $CURRENT | grep -oE '([0-9]+\.){2}[0-9]+' | cut -d. -f2)
+  CURRENT_PATCH=$(echo $CURRENT | grep -oE '([0-9]+\.){2}[0-9]+' | cut -d. -f3)
+  CURRENT_SUFFIX=$(echo $CURRENT | sed -e "s/$CURRENT_MAJOR\.$CURRENT_MINOR\.$CURRENT_PATCH//g")
+  NEW_MAJOR=$(echo $NEW_VERSION | grep -oE '([0-9]+\.){2}[0-9]+' | cut -d. -f1)
+  NEW_MINOR=$(echo $NEW_VERSION | grep -oE '([0-9]+\.){2}[0-9]+' | cut -d. -f2)
+  NEW_PATCH=$(echo $NEW_VERSION | grep -oE '([0-9]+\.){2}[0-9]+' | cut -d. -f3)
+  NEW_SUFFIX=$(echo $NEW_VERSION | sed -e "s/$NEW_MAJOR\.$NEW_MINOR\.$NEW_PATCH//g")
 
   if [ "$NEW_MAJOR" -gt "$CURRENT_MAJOR" ]; then
     VERSION_OK=true
@@ -305,6 +312,13 @@ function set-version
   if [[ "$NEW_MAJOR" -eq "$CURRENT_MAJOR"
       && "$NEW_MINOR" -eq "$CURRENT_MINOR"
       && "$NEW_PATCH" -gt "$CURRENT_PATCH" ]]; then
+    VERSION_OK=true
+  fi
+
+  if [[ "$NEW_MAJOR" -eq "$CURRENT_MAJOR"
+      && "$NEW_MINOR" -eq "$CURRENT_MINOR"
+      && "$NEW_PATCH" -eq "$CURRENT_PATCH"
+      && "$NEW_SUFFIX" != "$CURRENT_SUFFIX" ]]; then
     VERSION_OK=true
   fi
 
