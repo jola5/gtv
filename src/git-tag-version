@@ -93,6 +93,9 @@ DESCRIPTION
         use this setting on your local or gobal git configuration.
         See 'git help config' for details.
 
+        Do not use the strict and non-strict options at the same time, because this
+        leads to undefined behaviour.
+
         If no explicit command is given gtv executes 'show'.
 
 COMMANDS

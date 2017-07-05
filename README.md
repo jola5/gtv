@@ -91,6 +91,8 @@ For general usage information on the git configuration see `git help config`.
 ### strict-mode
 Assigning mulitple version tags to the same commit is possible by default, if you want to omit this behaviour use the `strict-mode` option. You can enable this strict-mode at all times by utilizing your git configuration like this `git config gtv.strict-mode true`. You can temporarily disable strict-mode again by using the `non-strict` option. The appropriate git configuration value is nothing or `git config gtv.strict-mode anything-but-true`.
 
+Do not use the `strict` and `non-strict` options at the same time, because this leads to undefined behaviour.
+
 ### suffix-delimiter
 You can change the suffix delimiter that is `v1.1.1<SUFFIX-DELIMITER><SUFFIX>` only by using the configuration option. Mind, the appropriate values are restricted by the git tag command since a tag needs to follow the reference name rule. Refer to `git check-ref-format` for details.
 
