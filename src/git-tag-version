@@ -42,7 +42,7 @@ function help
 
 SYNOPSIS
         git-tag-version [command] [-m|--message=<message>] [-x|--suffix=<suffix>]
-            [-s|--strict] [-n|--non-strict] [-f|--force]
+            [-s|--strict] [-n|--non-strict] [-f|--force] [<commit>]
 
 DESCRIPTION
         A script to use git tags for repository version numbers through a simple
@@ -114,7 +114,7 @@ COMMANDS
 
         new     <major|minor|patch> [-m|--message=<message>]
                 [-x|--suffix=<suffix>] [-s|--strict]
-                [-n|--non-strict]
+                [-n|--non-strict] [<commit>]
                 Create a new git version number tag by a simple increment to the
                 given version part major, minor or patch.
                 'gtv new major' on an existing v0.41.1  creates v1.0.0.
@@ -125,15 +125,19 @@ COMMANDS
                 suffixs as a suffix to the tag name itself. Do not allow
                 assignment of mulitple version tags to the same commit using
                 'strict'.
+                You may assign to any commit of your choice by additionally
+                supplying a commit hash.
 
         set     <version> [-m|--message=<message>] [-x|--suffix=<suffix>]
-                [-s|--strict] [-n|--non-strict] [-f|--force]
+                [-s|--strict] [-n|--non-strict] [-f|--force] [<commit>]
                 Assign a specific git version number tag, must be strictly
                 increasing. Add the optional message to annotated tags. Add the
                 optional tag suffix as a suffix to the tag name itself. Do not
                 allow assignment of mulitple version tags to the same commit
                 using 'strict'. If you want to assign a not strictly increasing
                 version number you may do so by using 'force'.
+                You may assign to any commit of your choice by additionally
+                supplying a commit hash.
 
 EXAMPLES
         # show current version, eg. 1.21.3
@@ -222,16 +226,18 @@ function strictly-increasing-version
 # create a version number tag
 # argument 1: short description
 # argument 2: version number string "major.minor.patch"
+# argiment 3: a specific commit hash the version tag is assigned to
 function create-version-tag
 {
   if [ "$STRICT" = true ]; then
     ensure-strict-mode
   fi
-  git tag -a "v$2${SUFFIX}" -m "version $2: $1" -m "${MESSAGE}"
+  git tag -a "v$2${SUFFIX}" -m "version $2: $1" -m "${MESSAGE}" $3
 }
 
 # create new version tag
 # argument 1: version type [major|minor|patch]
+# argiment 3: a specific commit hash the version tag is assigned to
 function new-version
 {
   # detect sub-command
@@ -241,7 +247,7 @@ function new-version
     NEW=$(strictly-increasing-version $1 $CURRENT)
     echo "Current version:   $CURRENT"
     echo "New $1 version: $NEW"
-    create-version-tag $1 $NEW
+    create-version-tag $1 $NEW $2
     ;;
     *)
     echo "ERROR: Unsupported version type '$1', use major, minor or patch!"
@@ -278,6 +284,7 @@ function ensure-strict-mode {
 
 # set specific version tag
 # argument 1: version number string "major.minor.patch"
+# argument 2: a specific commit hash to assign a version to
 function set-version
 {
   if ! is-gtv-tag "v$1"; then
@@ -328,7 +335,7 @@ function set-version
 
   if [ "$VERSION_OK" = true ] || [ "$FORCE" = true ]; then
     echo "New version: $1"
-    create-version-tag "manually defined version number" $1
+    create-version-tag "manually defined version number" $1 $2
   else
     echo "ERROR: $1 is not a strictly increasing version number. Current is $CURRENT."
     exit 1;
@@ -420,10 +427,10 @@ case "$1" in
     version
     ;;
     "new")
-    new-version $2
+    new-version $2 $3
     ;;
     "set")
-    set-version $2
+    set-version $2 $3
     ;;
     *)
     show
