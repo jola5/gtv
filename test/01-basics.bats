@@ -71,7 +71,7 @@ function teardown {
   [ "$output" = "1.2.3" ]
 }
 
-@test "set semantically invalid specific version fails" {
+@test "set specific non-strictly-increasing version fails" {
   run ${GTV} init
   run ${GTV} set 1.2.3
   run ${GTV} set 1.0.0
@@ -85,4 +85,11 @@ function teardown {
   run ${GTV} set a.b3tete.te
   echo "status: $status"
   [ "$status" = 1 ]
+}
+
+@test "set specifc non-strictly-increasing version with force" {
+  run ${GTV} init
+  run ${GTV} set 1.2.3
+  run ${GTV} set 1.0.0 --force
+  [ "$status" = 0 ]
 }

@@ -42,7 +42,7 @@ function help
 
 SYNOPSIS
         git-tag-version [command] [-m|--message=<message>] [-x|--suffix=<suffix>]
-            [-s|--strict] [-n|--non-strict]
+            [-s|--strict] [-n|--non-strict] [-f|--force]
 
 DESCRIPTION
         A script to use git tags for repository version numbers through a simple
@@ -80,7 +80,7 @@ DESCRIPTION
         For gtv there is no meaning in suffixes like 'alpha', 'beta', 'RC1' etc.
         If you assign multiple tag versions to the same commit by non-strict mode
         the version reported by 'gtv show' is the last version that is reported by
-        'git tag --list'. This may or may not be what is expected. 
+        'git tag --list'. This may or may not be what is expected.
 
         Mind, assigning mulitple version tags to the same commit is possible
         by default. If you want to omit this behaviour use the strict-mode option.
@@ -124,12 +124,13 @@ COMMANDS
                 'strict'.
 
         set     <version> [-m|--message=<message>] [-x|--suffix=<suffix>]
-                [-s|--strict] [-n|--non-strict]
+                [-s|--strict] [-n|--non-strict] [-f|--force]
                 Assign a specific git version number tag, must be strictly
                 increasing. Add the optional message to annotated tags. Add the
                 optional tag suffix as a suffix to the tag name itself. Do not
                 allow assignment of mulitple version tags to the same commit
-                using 'strict'.
+                using 'strict'. If you want to assign a not strictly increasing
+                version number you may do so by using 'force'.
 
 EXAMPLES
         # show current version, eg. 1.21.3
@@ -322,7 +323,7 @@ function set-version
     VERSION_OK=true
   fi
 
-  if [ "$VERSION_OK" = true ]; then
+  if [ "$VERSION_OK" = true ] || [ "$FORCE" = true ]; then
     echo "New version: $1"
     create-version-tag "manually defined version number" $1
   else
@@ -353,9 +354,10 @@ SUFFIX_DELIMITER=$(git config gtv.suffix-delimiter)
 SUFFIX_DELIMITER=${SUFFIX_DELIMITER:--}
 STRICT=$(git config gtv.strict-mode)
 STRICT=${STRICT:-false}
+FORCE=false
 
 # get the optional arguments
-ARGS=$(getopt -o m:nsx: -l "message:,non-strict,strict,suffix:" -n "getopt.sh" -- "$@");
+ARGS=$(getopt -o fm:nsx: -l "force,message:,non-strict,strict,suffix:" -n "getopt.sh" -- "$@");
 
 #Bad arguments
 if [ $? -ne 0 ];
@@ -367,6 +369,10 @@ eval set -- "$ARGS";
 
 while true; do
   case "$1" in
+    -f|--force)
+      FORCE=true
+      shift;
+      ;;
     -n|--non-strict)
       STRICT=false
       shift;
