@@ -32,7 +32,12 @@ function cmd_test {
   git clone https://github.com/sstephenson/bats.git &> /dev/null || : # do not abort if clone exists
   PATH=$PATH:${WORKSPACE}/bats/bin
   date > ${TEST_RESULTS}
-  env GTV="${GTV}" bats ${TEST_DIR}/*.bats | tee ${TEST_RESULTS}
+
+  target=$1
+  if [ -z "$target" ]; then
+    target="*"
+  fi
+  env GTV="${GTV}" bats ${TEST_DIR}/${target}.bats | tee ${TEST_RESULTS}
   echo "Test results saved to ${TEST_RESULTS}"
 }
 
@@ -74,7 +79,7 @@ case "$1" in
     cmd_validate
     ;;
   "test")
-    cmd_test
+    cmd_test $2
     ;;
   "tag")
     cmd_tag
