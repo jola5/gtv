@@ -44,6 +44,7 @@ function cmd_test {
 function cmd_validate {
   echo -e "\n## Validating files"
   bash -n ${GTV}
+  shellcheck ${GTV}
   # only validate travis file if not on travis
   if [ -z "${TRAVIS_BUILD_NUMBER}" ]; then
     travis lint ${WORKSPACE}/.travis.yml
