@@ -11,3 +11,9 @@ deploy:
     repo: jola5/gtv
     branch: master
     tags: true
+addons:
+  apt:
+    sources:
+    - debian-sid    # Grab ShellCheck from the Debian repo
+    packages:
+    - shellcheck
