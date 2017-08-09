@@ -125,6 +125,7 @@ case "$1" in
     ;;
   *)
     cmd_clean
+    cmd_format
     cmd_validate
     cmd_test
     cmd_build "$2"
