@@ -9,15 +9,15 @@ TEST_DIR=${WORKSPACE}/test
 TEST_RESULTS=${BUILD_DIR}/test.results
 cd "${WORKSPACE}"
 
-function echoBold {
+function echoBold() {
   echo -e "\033[1m${1}\033[0m"
 }
 
-function echoYellow {
+function echoYellow() {
   echo -e "\033[1;33m${1}\033[0m"
 }
 
-function cmd_help {
+function cmd_help() {
   echo "$0 COMMAND
 
 COMMAND
@@ -28,30 +28,30 @@ COMMAND
 "
 }
 
-function cmd_clean {
+function cmd_clean() {
   echoBold "\nCleaning up"
   rm -rfv "${BUILD_DIR}"
 }
 
-function cmd_format {
+function cmd_format() {
   echoBold "\nFormatting source files"
   mkdir -p "${WORKSPACE}/shfmt"
   # make shfmt available and format sources
   SHFMT_URL="https://github.com/mvdan/sh/releases/download/v1.3.1/shfmt_v1.3.1_linux_amd64"
-  curl -sSL "${SHFMT_URL}" -o "${WORKSPACE}/shfmt/shfmt";
-  chmod +x "${WORKSPACE}/shfmt";
+  curl -sSL "${SHFMT_URL}" -o "${WORKSPACE}/shfmt/shfmt"
+  chmod +x "${WORKSPACE}/shfmt"
   PATH=$PATH:${WORKSPACE}/shfmt
 
   shfmt -i 2 -w ${GTV}
 }
 
-function cmd_test {
+function cmd_test() {
   echoBold "\nExecuting tests"
   mkdir -p "${WORKSPACE}/build"
   # make bats available and execute tests
-  git clone https://github.com/sstephenson/bats.git &> /dev/null || : # do not abort if clone exists
+  git clone https://github.com/sstephenson/bats.git &>/dev/null || : # do not abort if clone exists
   PATH=$PATH:${WORKSPACE}/bats/bin
-  date > "${TEST_RESULTS}"
+  date >"${TEST_RESULTS}"
 
   target=$1
   if [ -z "$target" ]; then
@@ -61,10 +61,10 @@ function cmd_test {
   echo "Test results saved to ${TEST_RESULTS}"
 }
 
-function cmd_validate {
+function cmd_validate() {
   echoBold "\nValidating files"
   bash -n "${GTV}"
-  if travis &> /dev/null; then
+  if travis &>/dev/null; then
     travis lint "${WORKSPACE}/.travis.yml"
   else
     echoYellow "Skipping travis file validation"
@@ -72,7 +72,7 @@ function cmd_validate {
 
   # we don't fail on static analysis findings, we fix them best as we can
   set +e
-  if shellcheck -V &> /dev/null; then
+  if shellcheck -V &>/dev/null; then
     shellcheck "${GTV}"
   else
     echoYellow "Skipping static analysis with shellcheck"
@@ -80,13 +80,13 @@ function cmd_validate {
   set -e
 }
 
-function cmd_tag {
+function cmd_tag() {
   echoBold "\nTagging version"
   ${GTV} new patch --strict
 }
 
 # build the gtv release artifact, expects version string number as first argument, auto generates it otherwise
-function cmd_build {
+function cmd_build() {
   echoBold "\nBuilding artifact"
   mkdir -p "${WORKSPACE}/build"
   cp -f "${WORKSPACE}/src/git-tag-version" "${BUILD_DIR}/"

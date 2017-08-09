@@ -35,8 +35,7 @@ GTV_VERSION="UNRELEASED"
 ################################################################################
 
 # display help
-function help
-{
+function help() {
   echo "NAME
         git-tag-version
 
@@ -164,14 +163,12 @@ EXAMPLES
 }
 
 # show version
-function version
-{
+function version() {
   echo "git-tag-version version \"$GTV_VERSION\""
 }
 
 # get current version tag and print its name, return 'none' if no version tag exists
-function get-current-version-tag
-{
+function get-current-version-tag() {
   TAG=$(git tag --list -n1 | grep -E "^v[0-9]+.[0-9]+.[0-9]+.*\s+version [0-9]+.[0-9]+.[0-9]+" | tail -n1 | cut -d" " -f1)
 
   if [ -z "$TAG" ]; then
@@ -182,8 +179,7 @@ function get-current-version-tag
 }
 
 # print latest version number in a plain format, '1.2.3'
-function show
-{
+function show() {
   TAG=$(get-current-version-tag)
   echo "$TAG" | tr -d 'v'
 
@@ -195,29 +191,28 @@ function show
 # print a new strictly increasing version number based on the given version string
 # argument 1: version type [major|minor|patch]
 # argument 2: current version number string "major.minor.patch"
-function strictly-increasing-version
-{
+function strictly-increasing-version() {
   MAJOR=$(echo "$2" | cut -d. -f1)
   MINOR=$(echo "$2" | cut -d. -f2)
   PATCH=$(echo "$2" | cut -d. -f3)
 
   case $1 in
     major)
-    MAJOR=$((MAJOR+1))
-    MINOR=0
-    PATCH=0
-    ;;
+      MAJOR=$((MAJOR + 1))
+      MINOR=0
+      PATCH=0
+      ;;
     minor)
-    MINOR=$((MINOR+1))
-    PATCH=0
-    ;;
+      MINOR=$((MINOR + 1))
+      PATCH=0
+      ;;
     patch)
-    PATCH=$((PATCH+1))
-    ;;
+      PATCH=$((PATCH + 1))
+      ;;
     *)
-    echo "ERROR: Unsupported version type '$1', use major, minor or patch!"
-    exit 1
-    ;;
+      echo "ERROR: Unsupported version type '$1', use major, minor or patch!"
+      exit 1
+      ;;
   esac
 
   echo "$MAJOR.$MINOR.$PATCH"
@@ -227,8 +222,7 @@ function strictly-increasing-version
 # argument 1: short description
 # argument 2: version number string "major.minor.patch"
 # argiment 3: a specific commit hash the version tag is assigned to
-function create-version-tag
-{
+function create-version-tag() {
   if [ "$STRICT" = true ]; then
     ensure-strict-mode
   fi
@@ -239,27 +233,26 @@ function create-version-tag
 # create new version tag
 # argument 1: version type [major|minor|patch]
 # argiment 3: a specific commit hash the version tag is assigned to
-function new-version
-{
+function new-version() {
   # detect sub-command
   case $1 in
-    major|minor|patch)
-    CURRENT=$(get-current-version-tag | tr -d 'v')
-    NEW=$(strictly-increasing-version "$1" "$CURRENT")
-    echo "Current version:   $CURRENT"
-    echo "New $1 version: $NEW"
-    create-version-tag "$1" "$NEW" "$2"
-    ;;
+    major | minor | patch)
+      CURRENT=$(get-current-version-tag | tr -d 'v')
+      NEW=$(strictly-increasing-version "$1" "$CURRENT")
+      echo "Current version:   $CURRENT"
+      echo "New $1 version: $NEW"
+      create-version-tag "$1" "$NEW" "$2"
+      ;;
     *)
-    echo "ERROR: Unsupported version type '$1', use major, minor or patch!"
-    exit 1
-    ;;
+      echo "ERROR: Unsupported version type '$1', use major, minor or patch!"
+      exit 1
+      ;;
   esac
 }
 
 # check if the given string is a gtv style tag
 # argument 1: the tag string to be checked
-function is-gtv-tag {
+function is-gtv-tag() {
   if [[ "$1" =~ ^v[0-9]+\.[0-9]+\.[0-9]+[^a-zA-Z]?.*$ ]]; then
     return 0
   else
@@ -268,7 +261,7 @@ function is-gtv-tag {
 }
 
 # fail if there is a gtv specific version tag on the current commit
-function ensure-strict-mode {
+function ensure-strict-mode() {
   GTVTAGEXISTS=false
   for tag in $(git tag --list --contain "$(git rev-parse HEAD)"); do
     echo "checking $tag"
@@ -286,8 +279,7 @@ function ensure-strict-mode {
 # set specific version tag
 # argument 1: version number string "major.minor.patch"
 # argument 2: a specific commit hash to assign a version to
-function set-version
-{
+function set-version() {
   if ! is-gtv-tag "v$1"; then
     echo "ERROR: '$1' is not a valid git tag version"
     exit 1
@@ -316,21 +308,15 @@ function set-version
     VERSION_OK=true
   fi
 
-  if [[ "$NEW_MAJOR" -eq "$CURRENT_MAJOR"
-      && "$NEW_MINOR" -gt "$CURRENT_MINOR" ]]; then
+  if [[ "$NEW_MAJOR" -eq "$CURRENT_MAJOR" && "$NEW_MINOR" -gt "$CURRENT_MINOR" ]]; then
     VERSION_OK=true
   fi
 
-  if [[ "$NEW_MAJOR" -eq "$CURRENT_MAJOR"
-      && "$NEW_MINOR" -eq "$CURRENT_MINOR"
-      && "$NEW_PATCH" -gt "$CURRENT_PATCH" ]]; then
+  if [[ "$NEW_MAJOR" -eq "$CURRENT_MAJOR" && "$NEW_MINOR" -eq "$CURRENT_MINOR" && "$NEW_PATCH" -gt "$CURRENT_PATCH" ]]; then
     VERSION_OK=true
   fi
 
-  if [[ "$NEW_MAJOR" -eq "$CURRENT_MAJOR"
-      && "$NEW_MINOR" -eq "$CURRENT_MINOR"
-      && "$NEW_PATCH" -eq "$CURRENT_PATCH"
-      && "$NEW_SUFFIX" != "$CURRENT_SUFFIX" ]]; then
+  if [[ "$NEW_MAJOR" -eq "$CURRENT_MAJOR" && "$NEW_MINOR" -eq "$CURRENT_MINOR" && "$NEW_PATCH" -eq "$CURRENT_PATCH" && "$NEW_SUFFIX" != "$CURRENT_SUFFIX" ]]; then
     VERSION_OK=true
   fi
 
@@ -339,13 +325,12 @@ function set-version
     create-version-tag "manually defined version number" "$1" "$2"
   else
     echo "ERROR: $1 is not a strictly increasing version number. Current is $CURRENT."
-    exit 1;
+    exit 1
   fi
 }
 
 # create an initial 'v0.0.0' version number tag
-function init
-{
+function init() {
   CURRENT=$(get-current-version-tag | tr -d 'v')
 
   if [ "$CURRENT" == "none" ]; then
@@ -372,64 +357,64 @@ if ! ARGS=$(getopt -o fm:nsx: -l "force,message:,non-strict,strict,suffix:" -n "
   exit 1
 fi
 
-eval set -- "$ARGS";
+eval set -- "$ARGS"
 
 while true; do
   case "$1" in
-    -f|--force)
+    -f | --force)
       FORCE=true
-      shift;
+      shift
       ;;
-    -n|--non-strict)
+    -n | --non-strict)
       STRICT=false
-      shift;
+      shift
       ;;
-    -m|--message)
-      shift;
+    -m | --message)
+      shift
       if [ -n "$1" ]; then
         MESSAGE=$1
-        shift;
+        shift
       fi
       ;;
-    -s|--strict)
+    -s | --strict)
       STRICT=true
-      shift;
+      shift
       ;;
-    -x|--suffix)
-      shift;
+    -x | --suffix)
+      shift
       if [ -n "$1" ]; then
         SUFFIX="${SUFFIX_DELIMITER}$1"
-        shift;
+        shift
       fi
       ;;
     --)
-      shift;
-      break;
+      shift
+      break
       ;;
   esac
 done
 
 # call the commands
 case "$1" in
-    "help")
+  "help")
     help
     ;;
-    "init")
+  "init")
     init
     ;;
-    "show")
+  "show")
     show
     ;;
-    "version")
+  "version")
     version
     ;;
-    "new")
+  "new")
     new-version "$2" "$3"
     ;;
-    "set")
+  "set")
     set-version "$2" "$3"
     ;;
-    *)
+  *)
     show
     ;;
 esac
