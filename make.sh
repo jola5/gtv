@@ -33,6 +33,18 @@ function cmd_clean {
   rm -rfv "${BUILD_DIR}"
 }
 
+function cmd_format {
+  echoBold "\nFormatting source files"
+  mkdir -p "${WORKSPACE}/shfmt"
+  # make shfmt available and format sources
+  SHFMT_URL="https://github.com/mvdan/sh/releases/download/v1.3.1/shfmt_v1.3.1_linux_amd64"
+  curl -sSL "${SHFMT_URL}" -o "${WORKSPACE}/shfmt/shfmt";
+  chmod +x "${WORKSPACE}/shfmt";
+  PATH=$PATH:${WORKSPACE}/shfmt
+
+  shfmt -i 2 -w ${GTV}
+}
+
 function cmd_test {
   echoBold "\nExecuting tests"
   mkdir -p "${WORKSPACE}/build"
@@ -92,6 +104,9 @@ function cmd_build {
 case "$1" in
   "clean")
     cmd_clean
+    ;;
+  "format")
+    cmd_format
     ;;
   "validate")
     cmd_validate
