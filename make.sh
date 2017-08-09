@@ -39,7 +39,7 @@ function cmd_format() {
   # make shfmt available and format sources
   SHFMT_URL="https://github.com/mvdan/sh/releases/download/v1.3.1/shfmt_v1.3.1_linux_amd64"
   curl -sSL "${SHFMT_URL}" -o "${WORKSPACE}/shfmt/shfmt"
-  chmod +x "${WORKSPACE}/shfmt"
+  chmod +x "${WORKSPACE}/shfmt/shfmt"
   PATH=$PATH:${WORKSPACE}/shfmt
 
   shfmt -i 2 -w ${GTV}
