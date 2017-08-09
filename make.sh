@@ -9,6 +9,10 @@ TEST_DIR=${WORKSPACE}/test
 TEST_RESULTS=${BUILD_DIR}/test.results
 cd "${WORKSPACE}"
 
+function echoBold {
+  echo -e "\033[1m${1}\033[0m"
+}
+
 function cmd_help {
   echo "$0 COMMAND
 
@@ -21,12 +25,12 @@ COMMAND
 }
 
 function cmd_clean {
-  echo -e "\n## Cleaning up"
+  echoBold "\nCleaning up"
   rm -rfv "${BUILD_DIR}"
 }
 
 function cmd_test {
-  echo -e "\n## Executing tests"
+  echoBold "\nExecuting tests"
   mkdir -p "${WORKSPACE}/build"
   # make bats available and execute tests
   git clone https://github.com/sstephenson/bats.git &> /dev/null || : # do not abort if clone exists
@@ -42,8 +46,7 @@ function cmd_test {
 }
 
 function cmd_validate {
-  echo -e "\n## Validating files"
-
+  echoBold "\nValidating files"
   bash -n "${GTV}"
   if travis &> /dev/null; then
     travis lint "${WORKSPACE}/.travis.yml"
@@ -58,13 +61,13 @@ function cmd_validate {
 }
 
 function cmd_tag {
-  echo -e "\n## Tagging version"
+  echoBold "\nTagging version"
   ${GTV} new patch --strict
 }
 
 # build the gtv release artifact, expects version string number as first argument, auto generates it otherwise
 function cmd_build {
-  echo -e "\n## Building artifact"
+  echoBold "\nBuilding artifact"
   mkdir -p "${WORKSPACE}/build"
   cp -f "${WORKSPACE}/src/git-tag-version" "${BUILD_DIR}/"
 
