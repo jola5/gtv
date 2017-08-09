@@ -13,6 +13,10 @@ function echoBold {
   echo -e "\033[1m${1}\033[0m"
 }
 
+function echoYellow {
+  echo -e "\033[1;33m${1}\033[0m"
+}
+
 function cmd_help {
   echo "$0 COMMAND
 
@@ -50,12 +54,16 @@ function cmd_validate {
   bash -n "${GTV}"
   if travis &> /dev/null; then
     travis lint "${WORKSPACE}/.travis.yml"
+  else
+    echoYellow "Skipping travis file validation"
   fi
 
   # we don't fail on static analysis findings, we fix them best as we can
   set +e
   if shellcheck -V &> /dev/null; then
     shellcheck "${GTV}"
+  else
+    echoYellow "Skipping static analysis with shellcheck"
   fi
   set -e
 }
