@@ -110,8 +110,10 @@ make.sh build $(git-tag-version)
 
 ### Test
 
-You can execute the tests with [Bash Automated Testing System](https://github.com/sstephenson/bats):
+You can execute the [BATS](https://github.com/sstephenson/bats) supported tests with:
 
 ``` bash
 make.sh test
+# you can even execute only specific test targets
+make.sh test '05*'
 ```

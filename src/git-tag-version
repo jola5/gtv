@@ -185,7 +185,7 @@ function get-current-version-tag
 function show
 {
   TAG=$(get-current-version-tag)
-  echo $TAG | tr -d 'v'
+  echo "$TAG" | tr -d 'v'
 
   if [ "$TAG" = "none" ]; then
     exit 1
@@ -197,9 +197,9 @@ function show
 # argument 2: current version number string "major.minor.patch"
 function strictly-increasing-version
 {
-  MAJOR=$(echo $2 | cut -d. -f1)
-  MINOR=$(echo $2 | cut -d. -f2)
-  PATCH=$(echo $2 | cut -d. -f3)
+  MAJOR=$(echo "$2" | cut -d. -f1)
+  MINOR=$(echo "$2" | cut -d. -f2)
+  PATCH=$(echo "$2" | cut -d. -f3)
 
   case $1 in
     major)
@@ -232,6 +232,7 @@ function create-version-tag
   if [ "$STRICT" = true ]; then
     ensure-strict-mode
   fi
+
   git tag -a "v$2${SUFFIX}" -m "version $2: $1" -m "${MESSAGE}" $3
 }
 
@@ -244,10 +245,10 @@ function new-version
   case $1 in
     major|minor|patch)
     CURRENT=$(get-current-version-tag | tr -d 'v')
-    NEW=$(strictly-increasing-version $1 $CURRENT)
+    NEW=$(strictly-increasing-version "$1" "$CURRENT")
     echo "Current version:   $CURRENT"
     echo "New $1 version: $NEW"
-    create-version-tag $1 $NEW $2
+    create-version-tag "$1" "$NEW" "$2"
     ;;
     *)
     echo "ERROR: Unsupported version type '$1', use major, minor or patch!"
@@ -269,9 +270,9 @@ function is-gtv-tag {
 # fail if there is a gtv specific version tag on the current commit
 function ensure-strict-mode {
   GTVTAGEXISTS=false
-  for tag in $(git tag --list --contain $(git rev-parse HEAD)); do
+  for tag in $(git tag --list --contain "$(git rev-parse HEAD)"); do
     echo "checking $tag"
-    if is-gtv-tag $tag; then
+    if is-gtv-tag "$tag"; then
       echo "ERROR: Using strict mode yet there is a version tag on this commit: $tag"
       GTVTAGEXISTS=true
     fi
@@ -302,14 +303,14 @@ function set-version
     CURRENT="0.0.0"
   fi
 
-  CURRENT_MAJOR=$(echo $CURRENT | grep -oE '([0-9]+\.){2}[0-9]+' | cut -d. -f1)
-  CURRENT_MINOR=$(echo $CURRENT | grep -oE '([0-9]+\.){2}[0-9]+' | cut -d. -f2)
-  CURRENT_PATCH=$(echo $CURRENT | grep -oE '([0-9]+\.){2}[0-9]+' | cut -d. -f3)
-  CURRENT_SUFFIX=$(echo $CURRENT | sed -e "s/$CURRENT_MAJOR\.$CURRENT_MINOR\.$CURRENT_PATCH//g")
-  NEW_MAJOR=$(echo $NEW_VERSION | grep -oE '([0-9]+\.){2}[0-9]+' | cut -d. -f1)
-  NEW_MINOR=$(echo $NEW_VERSION | grep -oE '([0-9]+\.){2}[0-9]+' | cut -d. -f2)
-  NEW_PATCH=$(echo $NEW_VERSION | grep -oE '([0-9]+\.){2}[0-9]+' | cut -d. -f3)
-  NEW_SUFFIX=$(echo $NEW_VERSION | sed -e "s/$NEW_MAJOR\.$NEW_MINOR\.$NEW_PATCH//g")
+  CURRENT_MAJOR=$(echo "$CURRENT" | grep -oE '([0-9]+\.){2}[0-9]+' | cut -d. -f1)
+  CURRENT_MINOR=$(echo "$CURRENT" | grep -oE '([0-9]+\.){2}[0-9]+' | cut -d. -f2)
+  CURRENT_PATCH=$(echo "$CURRENT" | grep -oE '([0-9]+\.){2}[0-9]+' | cut -d. -f3)
+  CURRENT_SUFFIX=${CURRENT//$CURRENT_MAJOR.$CURRENT_MINOR.$CURRENT_PATCH/}
+  NEW_MAJOR=$(echo "$NEW_VERSION" | grep -oE '([0-9]+\.){2}[0-9]+' | cut -d. -f1)
+  NEW_MINOR=$(echo "$NEW_VERSION" | grep -oE '([0-9]+\.){2}[0-9]+' | cut -d. -f2)
+  NEW_PATCH=$(echo "$NEW_VERSION" | grep -oE '([0-9]+\.){2}[0-9]+' | cut -d. -f3)
+  NEW_SUFFIX=${NEW_VERSION//$NEW_MAJOR.$NEW_MINOR.$NEW_PATCH/}
 
   if [ "$NEW_MAJOR" -gt "$CURRENT_MAJOR" ]; then
     VERSION_OK=true
@@ -335,7 +336,7 @@ function set-version
 
   if [ "$VERSION_OK" = true ] || [ "$FORCE" = true ]; then
     echo "New version: $1"
-    create-version-tag "manually defined version number" $1 $2
+    create-version-tag "manually defined version number" "$1" "$2"
   else
     echo "ERROR: $1 is not a strictly increasing version number. Current is $CURRENT."
     exit 1;
@@ -366,12 +367,8 @@ STRICT=$(git config gtv.strict-mode)
 STRICT=${STRICT:-false}
 FORCE=false
 
-# get the optional arguments
-ARGS=$(getopt -o fm:nsx: -l "force,message:,non-strict,strict,suffix:" -n "getopt.sh" -- "$@");
-
-#Bad arguments
-if [ $? -ne 0 ];
-then
+# get the optional arguments and handle bad arguments
+if ! ARGS=$(getopt -o fm:nsx: -l "force,message:,non-strict,strict,suffix:" -n "getopt.sh" -- "$@"); then
   exit 1
 fi
 
@@ -427,10 +424,10 @@ case "$1" in
     version
     ;;
     "new")
-    new-version $2 $3
+    new-version "$2" "$3"
     ;;
     "set")
-    set-version $2 $3
+    set-version "$2" "$3"
     ;;
     *)
     show
