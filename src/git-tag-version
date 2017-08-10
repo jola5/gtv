@@ -179,7 +179,7 @@ function version() {
 
 # get current version tag and print its name, return 'none' if no version tag exists
 function get-current-version-tag() {
-  TAG=$(git tag --list -n1 | grep -E "^v[0-9]+.[0-9]+.[0-9]+.*\s+version [0-9]+.[0-9]+.[0-9]+" | tail -n1 | cut -d" " -f1)
+  TAG=$(git tag --list 'v*' -n1 --merged | grep -E "^v[0-9]+.[0-9]+.[0-9]+.*\s+version [0-9]+.[0-9]+.[0-9]+" | tail -n1 | cut -d" " -f1)
 
   if [ -z "$TAG" ]; then
     TAG="none"
@@ -228,6 +228,30 @@ function strictly-increasing-version() {
   echo "$MAJOR.$MINOR.$PATCH"
 }
 
+# print a new strictly increasing and unique version number based on the given version string
+# argument 1: version type [major|minor|patch]
+# argument 2: current version number string "major.minor.patch"
+function new-unique-version() {
+  # we need to find a new version number that is not present in the whole repository
+  nextVersion="$2"
+  maxVersionsToTry=100
+  COUNTER=0
+  while [ "$COUNTER" -lt "$maxVersionsToTry" ]; do
+    let COUNTER+=1
+    nextVersion=$(strictly-increasing-version "$1" "$nextVersion")
+
+    # omit any output of 'git tag' at all, since this ruins our echo-as-return-value scheme
+    if git tag --list 'v*' -n1 | grep -E "^v[0-9]+.[0-9]+.[0-9]+.*\s+version [0-9]+.[0-9]+.[0-9]+" | grep -o &> /dev/null "$nextVersion"; then
+      echo-warning "New version '$nextVersion' for this branch is already present in this repository. Trying next available version."
+    else
+      echo "$nextVersion"
+      return
+    fi
+  done
+
+  echo-error "ERROR: Unable to find a new version in '$maxVersionsToTry' tries."
+}
+
 # create a version number tag
 # argument 1: short description
 # argument 2: version number string "major.minor.patch"
@@ -242,13 +266,13 @@ function create-version-tag() {
 
 # create new version tag
 # argument 1: version type [major|minor|patch]
-# argiment 3: a specific commit hash the version tag is assigned to
+# argiment 2: a specific commit hash the version tag is assigned to
 function new-version() {
   # detect sub-command
   case $1 in
     major | minor | patch)
       CURRENT=$(get-current-version-tag | tr -d 'v')
-      NEW=$(strictly-increasing-version "$1" "$CURRENT")
+      NEW=$(new-unique-version "$1" "$CURRENT")
       echo "Current version:   $CURRENT"
       echo "New $1 version: $NEW"
       create-version-tag "$1" "$NEW" "$2"
