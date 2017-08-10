@@ -162,6 +162,16 @@ EXAMPLES
 "
 }
 
+# print red error messages to stderr
+function echo-error() {
+  (>&2 echo -e "\e[31m$1\e[0m")
+}
+
+# print yellow warning messages to stderr
+function echo-warning() {
+  (>&2 echo -e "\e[33m$1\e[0m")
+}
+
 # show version
 function version() {
   echo "git-tag-version version \"$GTV_VERSION\""
@@ -210,7 +220,7 @@ function strictly-increasing-version() {
       PATCH=$((PATCH + 1))
       ;;
     *)
-      echo "ERROR: Unsupported version type '$1', use major, minor or patch!"
+      echo-error "ERROR: Unsupported version type '$1', use major, minor or patch!"
       exit 1
       ;;
   esac
@@ -244,7 +254,7 @@ function new-version() {
       create-version-tag "$1" "$NEW" "$2"
       ;;
     *)
-      echo "ERROR: Unsupported version type '$1', use major, minor or patch!"
+      echo-error "ERROR: Unsupported version type '$1', use major, minor or patch!"
       exit 1
       ;;
   esac
@@ -266,7 +276,7 @@ function ensure-strict-mode() {
   for tag in $(git tag --list --contain "$(git rev-parse HEAD)"); do
     echo "checking $tag"
     if is-gtv-tag "$tag"; then
-      echo "ERROR: Using strict mode yet there is a version tag on this commit: $tag"
+      echo-error "ERROR: Using strict mode yet there is a version tag on this commit: $tag"
       GTVTAGEXISTS=true
     fi
   done
@@ -281,7 +291,7 @@ function ensure-strict-mode() {
 # argument 2: a specific commit hash to assign a version to
 function set-version() {
   if ! is-gtv-tag "v$1"; then
-    echo "ERROR: '$1' is not a valid git tag version"
+    echo-error "ERROR: '$1' is not a valid git tag version"
     exit 1
   fi
 
@@ -324,7 +334,7 @@ function set-version() {
     echo "New version: $1"
     create-version-tag "manually defined version number" "$1" "$2"
   else
-    echo "ERROR: $1 is not a strictly increasing version number. Current is $CURRENT."
+    echo-error "ERROR: $1 is not a strictly increasing version number. Current is $CURRENT."
     exit 1
   fi
 }
@@ -337,7 +347,7 @@ function init() {
     create-version-tag "initial" "0.0.0"
     echo "Initial version: 0.0.0"
   else
-    echo "ERROR: Repository contains a version tag already, $CURRENT."
+    echo-error "ERROR: Repository contains a version tag already, $CURRENT."
   fi
 }
 
