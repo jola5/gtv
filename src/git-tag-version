@@ -164,12 +164,12 @@ EXAMPLES
 
 # print red error messages to stderr
 function echo-error() {
-  (>&2 echo -e "\e[31m$1\e[0m")
+  (echo >&2 -e "\e[31m$1\e[0m")
 }
 
 # print yellow warning messages to stderr
 function echo-warning() {
-  (>&2 echo -e "\e[33m$1\e[0m")
+  (echo >&2 -e "\e[33m$1\e[0m")
 }
 
 # show version
@@ -241,7 +241,7 @@ function new-unique-version() {
     nextVersion=$(strictly-increasing-version "$1" "$nextVersion")
 
     # omit any output of 'git tag' at all, since this ruins our echo-as-return-value scheme
-    if git tag --list 'v*' -n1 | grep -E "^v[0-9]+.[0-9]+.[0-9]+.*\s+version [0-9]+.[0-9]+.[0-9]+" | grep -o &> /dev/null "$nextVersion"; then
+    if git tag --list 'v*' -n1 | grep -E "^v[0-9]+.[0-9]+.[0-9]+.*\s+version [0-9]+.[0-9]+.[0-9]+" | grep -o "$nextVersion" &>/dev/null; then
       echo-warning "New version '$nextVersion' for this branch is already present in this repository. Trying next available version."
     else
       echo "$nextVersion"
