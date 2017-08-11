@@ -179,7 +179,7 @@ function version() {
 
 # get current version tag and print its name, return 'none' if no version tag exists
 function get-current-version-tag() {
-  TAG=$(git tag --list 'v*' -n1 --merged | grep -E "^v[0-9]+.[0-9]+.[0-9]+.*\s+version [0-9]+.[0-9]+.[0-9]+" | tail -n1 | cut -d" " -f1)
+  TAG=$(git log --oneline --decorate=short | grep -E "tag: v[0-9]+\.[0-9]+\.[0-9]" | grep -oE "v[0-9]+\.[0-9]+\.[0-9]+[^,\)]*" | xargs git tag --list {} -n1 | grep -E "^v[0-9]+\.[0-9]+\.[0-9]+.*\s+version [0-9]+\.[0-9]+\.[0-9]+" | tail -n1 | cut -d" " -f1)
 
   if [ -z "$TAG" ]; then
     TAG="none"
