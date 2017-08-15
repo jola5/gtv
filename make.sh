@@ -132,35 +132,39 @@ function cmd_build() {
   echo "Provided at ${BUILD_DIR}/git-tag-version"
 }
 
-case "$1" in
-  "git")
-    cmd_git "$2"
-    ;;
-  "clean")
-    cmd_clean
-    ;;
-  "format")
-    cmd_format
-    ;;
-  "validate")
-    cmd_validate
-    ;;
-  "test")
-    cmd_test "$2"
-    ;;
-  "tag")
-    cmd_tag
-    ;;
-  "build")
-    cmd_build "$2"
-    ;;
-  "help")
-    cmd_help
-    ;;
-  *)
-    cmd_format
-    cmd_validate
-    cmd_test
-    cmd_build "$2"
-    ;;
-esac
+while test $# -gt 0; do
+  case "$1" in
+    "git")
+      cmd_git "$2"
+      shift 2
+      ;;
+    "clean")
+      cmd_clean
+      shift
+      ;;
+    "format")
+      cmd_format
+      shift
+      ;;
+    "validate")
+      cmd_validate
+      shift
+      ;;
+    "test")
+      cmd_test "$2"
+      shift 2
+      ;;
+    "tag")
+      cmd_tag
+      shift
+      ;;
+    "build")
+      cmd_build "$2"
+      shift
+      ;;
+    "help")
+      cmd_help
+      shift
+      ;;
+  esac
+done
