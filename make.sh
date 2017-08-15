@@ -21,11 +21,28 @@ function cmd_help() {
   echo "$0 COMMAND
 
 COMMAND
-  help    print this help text
-  test    run tests, returns 0 on success, test results in \"TEST_RESULTS\"
-  tag     create a new patch version
-  build   create a release artifact in \"${BUILD_DIR}/git-tag-version\"
+  clean           clean any existing build artifacts
+  help            print this help text
+  test [target]   run tests, returns 0 on success, test results in \"TEST_RESULTS\", for targets see \"${TEST_DIR}\"
+  tag             create a new patch version
+  build           create a release artifact in \"${BUILD_DIR}/git-tag-version\"
+  git <version>   prepare build for the given git version, eg. \"2.14.1\" (used to test against different git versions)
 "
+}
+
+function cmd_git() {
+  echoBold "\nPreparing for git v${1}"
+
+  cd "${BUILD_DIR}"
+  wget "https://github.com/git/git/archive/v${1}.tar.gz"
+  tar -zxf "v${1}.tar.gz"
+  rm -rf "v${1}.tar.gz"
+  cd "git-${1}"
+  make configure
+  ./configure --prefix=/usr
+  make
+  export GIT="$(find ./ -maxdepth 1 -type f -executable -name 'git' | xargs readlink -f)"
+  echo "Using GIT=${GIT}"
 }
 
 function cmd_clean() {
@@ -57,7 +74,7 @@ function cmd_test() {
   if [ -z "$target" ]; then
     target="*"
   fi
-  env GTV="${GTV}" bats ${TEST_DIR}/${target}.bats | tee "${TEST_RESULTS}"
+  env GTV="${GTV}" GIT="${GIT}" bats ${TEST_DIR}/${target}.bats | tee "${TEST_RESULTS}"
   echo "Test results saved to ${TEST_RESULTS}"
 }
 
@@ -102,6 +119,9 @@ function cmd_build() {
 }
 
 case "$1" in
+  "git")
+    cmd_git "$2"
+    ;;
   "clean")
     cmd_clean
     ;;

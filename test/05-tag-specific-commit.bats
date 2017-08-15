@@ -8,6 +8,14 @@ if [ ! -x "$GTV" ]; then
   exit 1
 fi
 
+: "${GIT:?Need to set environment variable 'GIT' to absolute git executable path}"
+if [ ! -x "$GIT" ]; then
+  echo "Environment variable 'GIT' needs to point to a git executable with absolute path"
+  exit 1
+fi
+
+# TODO: replace git with ${GIT}
+
 function setup {
   export TEST_DIR=$(mktemp -d)
   cd $TEST_DIR
