@@ -81,6 +81,10 @@ function cmd_test() {
     target="*"
   fi
 
+  if [ -z "${GIT}" ]; then
+    export GIT=$(which git)
+  fi
+
   echo -e "\tGIT is ${GIT}, $(${GIT} --version)"
   echo -e "\tGTV is ${GTV}, $(${GIT} describe)\n"
 
