@@ -74,6 +74,15 @@ function cmd_test() {
   if [ -z "$target" ]; then
     target="*"
   fi
+
+  # use default git if non specified by environment
+  if [ ! -x "$GIT" ]; then
+    GIT=$(which git)
+  fi
+
+  echo -e "\tGIT is ${GIT}, $(${GIT} --version)"
+  echo -e "\tGTV is ${GTV}, $(${GIT} describe)\n"
+
   env GTV="${GTV}" GIT="${GIT}" bats ${TEST_DIR}/${target}.bats | tee "${TEST_RESULTS}"
   echo "Test results saved to ${TEST_RESULTS}"
 }

@@ -14,20 +14,18 @@ if [ ! -x "$GIT" ]; then
   exit 1
 fi
 
-# TODO: replace git with ${GIT}
-
 function setup {
   export TEST_DIR=$(mktemp -d)
   cd $TEST_DIR
 
-  git init
+  ${GIT} init
   # we need to provide a basic git configuration - on travis there is none
-  git config user.email "noreply@travis-ci.org"
-  git config user.name "travis build git user"
+  ${GIT} config user.email "noreply@travis-ci.org"
+  ${GIT} config user.name "travis build git user"
 
   date > file
-  git add .
-  git commit -m "initial"
+  ${GIT} add .
+  ${GIT} commit -m "initial"
 }
 
 function teardown {

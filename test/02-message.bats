@@ -14,20 +14,18 @@ if [ ! -x "$GIT" ]; then
   exit 1
 fi
 
-# TODO: replace git with ${GIT}
-
 function setup {
   export TEST_DIR=$(mktemp -d)
   cd $TEST_DIR
 
-  git init
+  ${GIT} init
   # we need to provide a basic git configuration - on travis there is none
-  git config user.email "noreply@travis-ci.org"
-  git config user.name "travis build git user"
+  ${GIT} config user.email "noreply@travis-ci.org"
+  ${GIT} config user.name "travis build git user"
 
   date > file
-  git add .
-  git commit -m "initial"
+  ${GIT} add .
+  ${GIT} commit -m "initial"
 }
 
 function teardown {
@@ -42,7 +40,7 @@ function teardown {
   EXPECTED="test tag wohooo"
   run ${GTV} init
   run ${GTV} new patch -m "${EXPECTED}"
-  RESULT=$(git tag --list "v0.0.1" -n99 | tail -n1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+  RESULT=$(${GIT} tag --list "v0.0.1" -n99 | tail -n1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
   [ "$RESULT" = "${EXPECTED}" ]
 }
 
@@ -50,7 +48,7 @@ function teardown {
   EXPECTED="test tag wohooo"
   run ${GTV} init
   run ${GTV} new minor -m "${EXPECTED}"
-  RESULT=$(git tag --list "v0.1.0" -n99 | tail -n1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+  RESULT=$(${GIT} tag --list "v0.1.0" -n99 | tail -n1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
   [ "$RESULT" = "${EXPECTED}" ]
 }
 
@@ -58,7 +56,7 @@ function teardown {
   EXPECTED="test tag wohooo"
   run ${GTV} init
   run ${GTV} new major -m "${EXPECTED}"
-  RESULT=$(git tag --list "v1.0.0" -n99 | tail -n1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+  RESULT=$(${GIT} tag --list "v1.0.0" -n99 | tail -n1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
   [ "$RESULT" = "${EXPECTED}" ]
 }
 
@@ -66,6 +64,6 @@ function teardown {
   EXPECTED="test tag wohooo"
   run ${GTV} init
   run ${GTV} set 1.1.1 -m "${EXPECTED}"
-  RESULT=$(git tag --list "v1.1.1" -n99 | tail -n1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+  RESULT=$(${GIT} tag --list "v1.1.1" -n99 | tail -n1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
   [ "$RESULT" = "${EXPECTED}" ]
 }

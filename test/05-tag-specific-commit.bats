@@ -14,20 +14,18 @@ if [ ! -x "$GIT" ]; then
   exit 1
 fi
 
-# TODO: replace git with ${GIT}
-
 function setup {
   export TEST_DIR=$(mktemp -d)
   cd $TEST_DIR
 
-  git init
+  ${GIT} init
   # we need to provide a basic git configuration - on travis there is none
-  git config user.email "noreply@travis-ci.org"
-  git config user.name "travis build git user"
+  ${GIT} config user.email "noreply@travis-ci.org"
+  ${GIT} config user.name "travis build git user"
 
   date > file
-  git add .
-  git commit -m "initial"
+  ${GIT} add .
+  ${GIT} commit -m "initial"
 }
 
 function teardown {
@@ -38,18 +36,18 @@ function teardown {
   run ${GTV} init
 
   run date > file
-  run git add *
-  run git commit -m "commit to be tagged"
-  TAGGED_COMMIT=$(git rev-parse --verify HEAD)
+  run ${GIT} add *
+  run ${GIT} commit -m "commit to be tagged"
+  TAGGED_COMMIT=$(${GIT} rev-parse --verify HEAD)
 
   run date > file2
-  run git add *
-  run git commit -m "commit stays untagged"
-  UNTAGGED_COMMIT=$(git rev-parse --verify HEAD)
+  run ${GIT} add *
+  run ${GIT} commit -m "commit stays untagged"
+  UNTAGGED_COMMIT=$(${GIT} rev-parse --verify HEAD)
 
   run ${GTV} new patch ${TAGGED_COMMIT}
 
-  run git rev-list -n 1 v0.0.1
+  run ${GIT} rev-list -n 1 v0.0.1
   [ "$output" != "$UNTAGGED_COMMIT" ]
   [ "$output" = "$TAGGED_COMMIT" ]
 }
@@ -58,18 +56,18 @@ function teardown {
   run ${GTV} init
 
   run date > file
-  run git add *
-  run git commit -m "commit to be tagged"
-  TAGGED_COMMIT=$(git rev-parse --verify HEAD)
+  run ${GIT} add *
+  run ${GIT} commit -m "commit to be tagged"
+  TAGGED_COMMIT=$(${GIT} rev-parse --verify HEAD)
 
   run date > file2
-  run git add *
-  run git commit -m "commit stays untagged"
-  UNTAGGED_COMMIT=$(git rev-parse --verify HEAD)
+  run ${GIT} add *
+  run ${GIT} commit -m "commit stays untagged"
+  UNTAGGED_COMMIT=$(${GIT} rev-parse --verify HEAD)
 
   run ${GTV} new minor ${TAGGED_COMMIT}
 
-  run git rev-list -n 1 v0.1.0
+  run ${GIT} rev-list -n 1 v0.1.0
   [ "$output" != "$UNTAGGED_COMMIT" ]
   [ "$output" = "$TAGGED_COMMIT" ]
 }
@@ -78,18 +76,18 @@ function teardown {
   run ${GTV} init
 
   run date > file
-  run git add *
-  run git commit -m "commit to be tagged"
-  TAGGED_COMMIT=$(git rev-parse --verify HEAD)
+  run ${GIT} add *
+  run ${GIT} commit -m "commit to be tagged"
+  TAGGED_COMMIT=$(${GIT} rev-parse --verify HEAD)
 
   run date > file2
-  run git add *
-  run git commit -m "commit stays untagged"
-  UNTAGGED_COMMIT=$(git rev-parse --verify HEAD)
+  run ${GIT} add *
+  run ${GIT} commit -m "commit stays untagged"
+  UNTAGGED_COMMIT=$(${GIT} rev-parse --verify HEAD)
 
   run ${GTV} new major ${TAGGED_COMMIT}
 
-  run git rev-list -n 1 v1.0.0
+  run ${GIT} rev-list -n 1 v1.0.0
   [ "$output" != "$UNTAGGED_COMMIT" ]
   [ "$output" = "$TAGGED_COMMIT" ]
 }
@@ -98,18 +96,18 @@ function teardown {
   run ${GTV} init
 
   run date > file
-  run git add *
-  run git commit -m "commit to be tagged"
-  TAGGED_COMMIT=$(git rev-parse --verify HEAD)
+  run ${GIT} add *
+  run ${GIT} commit -m "commit to be tagged"
+  TAGGED_COMMIT=$(${GIT} rev-parse --verify HEAD)
 
   run date > file2
-  run git add *
-  run git commit -m "commit stays untagged"
-  UNTAGGED_COMMIT=$(git rev-parse --verify HEAD)
+  run ${GIT} add *
+  run ${GIT} commit -m "commit stays untagged"
+  UNTAGGED_COMMIT=$(${GIT} rev-parse --verify HEAD)
 
   run ${GTV} set 1.2.3 ${TAGGED_COMMIT}
 
-  run git rev-list -n 1 v1.2.3
+  run ${GIT} rev-list -n 1 v1.2.3
   [ "$output" != "$UNTAGGED_COMMIT" ]
   [ "$output" = "$TAGGED_COMMIT" ]
 }

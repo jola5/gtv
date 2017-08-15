@@ -14,25 +14,23 @@ if [ ! -x "$GIT" ]; then
   exit 1
 fi
 
-# TODO: replace git with ${GIT}
-
 function setup {
   export TEST_DIR=$(mktemp -d)
   cd $TEST_DIR
 
-  git init
+  ${GIT} init
   # we need to provide a basic git configuration - on travis there is none
-  git config user.email "noreply@travis-ci.org"
-  git config user.name "travis build git user"
+  ${GIT} config user.email "noreply@travis-ci.org"
+  ${GIT} config user.name "travis build git user"
 
   date > file
-  git add .
-  git commit -m "initial"
+  ${GIT} add .
+  ${GIT} commit -m "initial"
 }
 
 function teardown {
   echo -e "\n"
-  git log --pretty=oneline --decorate --all --graph --abbrev-commit
+  ${GIT} log --pretty=oneline --decorate --all --graph --abbrev-commit
   echo -e "\n"
   echo "$TEST_DIR"
   rm -rf $TEST_DIR
@@ -41,27 +39,27 @@ function teardown {
 @test "create new patch versions on branches with differing minor versions" {
   ${GTV} init
 
-  git checkout -b branch_one master
+  ${GIT} checkout -b branch_one master
   date >> file
-  git add *
-  git commit -m "commit on branch one"
+  ${GIT} add *
+  ${GIT} commit -m "commit on branch one"
   ${GTV} new patch
   run ${GTV}
   [ "$output" = "0.0.1" ]
 
-  git checkout -b branch_two master
+  ${GIT} checkout -b branch_two master
   date >> file
-  git add *
-  git commit -m "commit on branch two"
+  ${GIT} add *
+  ${GIT} commit -m "commit on branch two"
   ${GTV} new minor
   ${GTV} new patch
   run ${GTV}
   [ "$output" = "0.1.1" ]
 
-  git checkout branch_one
+  ${GIT} checkout branch_one
   date >> file
-  git add *
-  git commit -m "commit on branch one"
+  ${GIT} add *
+  ${GIT} commit -m "commit on branch one"
   ${GTV} new patch
   run ${GTV}
   [ "$output" = "0.0.2" ]
@@ -70,27 +68,27 @@ function teardown {
 @test "create new patch versions on branches with differing major versions" {
   ${GTV} init
 
-  git checkout -b branch_one master
+  ${GIT} checkout -b branch_one master
   date >> file
-  git add *
-  git commit -m "commit on branch one"
+  ${GIT} add *
+  ${GIT} commit -m "commit on branch one"
   ${GTV} new patch
   run ${GTV}
   [ "$output" = "0.0.1" ]
 
-  git checkout -b branch_two master
+  ${GIT} checkout -b branch_two master
   date >> file
-  git add *
-  git commit -m "commit on branch two"
+  ${GIT} add *
+  ${GIT} commit -m "commit on branch two"
   ${GTV} new major
   ${GTV} new patch
   run ${GTV}
   [ "$output" = "1.0.1" ]
 
-  git checkout branch_one
+  ${GIT} checkout branch_one
   date >> file
-  git add *
-  git commit -m "commit on branch one"
+  ${GIT} add *
+  ${GIT} commit -m "commit on branch one"
   ${GTV} new patch
   run ${GTV}
   [ "$output" = "0.0.2" ]
@@ -99,27 +97,27 @@ function teardown {
 @test "create new minor versions on branches with differing major versions" {
   ${GTV} init
 
-  git checkout -b branch_one master
+  ${GIT} checkout -b branch_one master
   date >> file
-  git add *
-  git commit -m "commit on branch one"
+  ${GIT} add *
+  ${GIT} commit -m "commit on branch one"
   ${GTV} new minor
   run ${GTV}
   [ "$output" = "0.1.0" ]
 
-  git checkout -b branch_two master
+  ${GIT} checkout -b branch_two master
   date >> file
-  git add *
-  git commit -m "commit on branch two"
+  ${GIT} add *
+  ${GIT} commit -m "commit on branch two"
   ${GTV} new major
   ${GTV} new minor
   run ${GTV}
   [ "$output" = "1.1.0" ]
 
-  git checkout branch_one
+  ${GIT} checkout branch_one
   date >> file
-  git add *
-  git commit -m "commit on branch one"
+  ${GIT} add *
+  ${GIT} commit -m "commit on branch one"
   ${GTV} new minor
   run ${GTV}
   [ "$output" = "0.2.0" ]
@@ -128,18 +126,18 @@ function teardown {
 @test "create new patch versions on branches without differing major and minor versions" {
   ${GTV} init
 
-  git checkout -b branch_one master
+  ${GIT} checkout -b branch_one master
   date >> file
-  git add *
-  git commit -m "commit on branch one"
+  ${GIT} add *
+  ${GIT} commit -m "commit on branch one"
   ${GTV} new patch
   run ${GTV}
   [ "$output" = "0.0.1" ]
 
-  git checkout -b branch_two master
+  ${GIT} checkout -b branch_two master
   date >> file
-  git add *
-  git commit -m "commit on branch two"
+  ${GIT} add *
+  ${GIT} commit -m "commit on branch two"
   ${GTV} new patch
   run ${GTV}
   [ "$output" = "0.0.2" ]
@@ -148,18 +146,18 @@ function teardown {
 @test "create new minor versions on branches without differing major and patch versions" {
   ${GTV} init
 
-  git checkout -b branch_one master
+  ${GIT} checkout -b branch_one master
   date >> file
-  git add *
-  git commit -m "commit on branch one"
+  ${GIT} add *
+  ${GIT} commit -m "commit on branch one"
   ${GTV} new minor
   run ${GTV}
   [ "$output" = "0.1.0" ]
 
-  git checkout -b branch_two master
+  ${GIT} checkout -b branch_two master
   date >> file
-  git add *
-  git commit -m "commit on branch two"
+  ${GIT} add *
+  ${GIT} commit -m "commit on branch two"
   ${GTV} new minor
   run ${GTV}
   [ "$output" = "0.2.0" ]
@@ -168,18 +166,18 @@ function teardown {
 @test "create new major versions on branches without differing minor and patch versions" {
   ${GTV} init
 
-  git checkout -b branch_one master
+  ${GIT} checkout -b branch_one master
   date >> file
-  git add *
-  git commit -m "commit on branch one"
+  ${GIT} add *
+  ${GIT} commit -m "commit on branch one"
   ${GTV} new major
   run ${GTV}
   [ "$output" = "1.0.0" ]
 
-  git checkout -b branch_two master
+  ${GIT} checkout -b branch_two master
   date >> file
-  git add *
-  git commit -m "commit on branch two"
+  ${GIT} add *
+  ${GIT} commit -m "commit on branch two"
   ${GTV} new major
   run ${GTV}
   [ "$output" = "2.0.0" ]

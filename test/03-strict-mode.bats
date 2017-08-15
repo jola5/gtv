@@ -14,20 +14,18 @@ if [ ! -x "$GIT" ]; then
   exit 1
 fi
 
-# TODO: replace git with ${GIT}
-
 function setup {
   export TEST_DIR=$(mktemp -d)
   cd $TEST_DIR
 
-  git init
+  ${GIT} init
   # we need to provide a basic git configuration - on travis there is none
-  git config user.email "noreply@travis-ci.org"
-  git config user.name "travis build git user"
+  ${GIT} config user.email "noreply@travis-ci.org"
+  ${GIT} config user.name "travis build git user"
 
   date > file
-  git add .
-  git commit -m "initial"
+  ${GIT} add .
+  ${GIT} commit -m "initial"
 }
 
 function teardown {
@@ -67,7 +65,7 @@ function teardown {
 }
 
 @test "set specific version on existing tag with strict mode enabled by git config fails" {
-  git config gtv.strict-mode true
+  ${GIT} config gtv.strict-mode true
   run ${GTV} init
   run ${GTV} set 1.0.0
   run ${GTV} set 1.2.3
@@ -76,7 +74,7 @@ function teardown {
 }
 
 @test "set specific version on existing tag with strict mode enabled by git config but non-strict argument given" {
-  git config gtv.strict-mode true
+  ${GIT} config gtv.strict-mode true
   run ${GTV} init
   run ${GTV} set 1.0.0
   run ${GTV} --non-strict set 1.2.3
@@ -85,7 +83,7 @@ function teardown {
 }
 
 @test "set specific version on existing tag with strict mode enabled by git config but short non-strict argument given" {
-  git config gtv.strict-mode true
+  ${GIT} config gtv.strict-mode true
   run ${GTV} init
   run ${GTV} set 1.0.0
   run ${GTV} -n set 1.2.3
@@ -94,7 +92,7 @@ function teardown {
 }
 
 @test "set specific version on existing tag with strict mode disabled by git config but strict argument given fails" {
-  git config gtv.strict-mode false
+  ${GIT} config gtv.strict-mode false
   run ${GTV} init
   run ${GTV} set 1.0.0
   run ${GTV} --strict set 1.2.3
