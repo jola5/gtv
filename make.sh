@@ -21,8 +21,10 @@ function cmd_help() {
   echo "$0 COMMAND
 
 COMMAND
-  clean           clean any existing build artifacts
   help            print this help text
+  format          format the source files
+  validate        valadite source and travis files
+  clean           clean any existing build artifacts
   test [target]   run tests, returns 0 on success, test results in \"TEST_RESULTS\", for targets see \"${TEST_DIR}\"
   tag             create a new patch version
   build           create a release artifact in \"${BUILD_DIR}/git-tag-version\"
