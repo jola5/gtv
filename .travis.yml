@@ -8,7 +8,7 @@ env:
     - GIT_VERSION="2.10.4"
     - GIT_VERSION="2.14.1"
 script:
-  - "./make.sh clean git '${GIT_VERSION}' format validate test '*' build"
+  - "./make.sh clean git \"${GIT_VERSION}\" format validate test '*' build"
 deploy:
   provider: releases
   api_key:
