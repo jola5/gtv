@@ -31,6 +31,10 @@ COMMAND
 }
 
 function cmd_git() {
+  if [ -z "${1}" ]; then
+    return
+  fi
+
   echoBold "\nPreparing for git v${1}"
 
   cd "${BUILD_DIR}"
