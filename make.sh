@@ -32,21 +32,22 @@ COMMAND
 
 function cmd_git() {
   if [ -z "${1}" ]; then
-    return
+    echoBold "\nSystem default $(git --version)"
+    export GIT=$(which git)
+  else
+    echoBold "\nPreparing for git v${1}"
+    mkdir -p "${BUILD_DIR}"
+    cd "${BUILD_DIR}"
+    wget "https://github.com/git/git/archive/v${1}.tar.gz"
+    tar -zxf "v${1}.tar.gz"
+    rm -rf "v${1}.tar.gz"
+    cd "git-${1}"
+    make configure
+    ./configure --prefix=/usr
+    make
+    export GIT="$(find ./ -maxdepth 1 -type f -executable -name 'git' | xargs readlink -f)"
   fi
 
-  echoBold "\nPreparing for git v${1}"
-
-  mkdir -p "${BUILD_DIR}"
-  cd "${BUILD_DIR}"
-  wget "https://github.com/git/git/archive/v${1}.tar.gz"
-  tar -zxf "v${1}.tar.gz"
-  rm -rf "v${1}.tar.gz"
-  cd "git-${1}"
-  make configure
-  ./configure --prefix=/usr
-  make
-  export GIT="$(find ./ -maxdepth 1 -type f -executable -name 'git' | xargs readlink -f)"
   echo "Using GIT=${GIT}"
 }
 
@@ -78,11 +79,6 @@ function cmd_test() {
   target=$1
   if [ -z "$target" ]; then
     target="*"
-  fi
-
-  # use default git if non specified by environment
-  if [ ! -x "$GIT" ]; then
-    GIT=$(which git)
   fi
 
   echo -e "\tGIT is ${GIT}, $(${GIT} --version)"
@@ -140,6 +136,7 @@ if [ $# -eq 0 ]; then
   cmd_test "*"
   cmd_build
 fi
+
 while test $# -gt 0; do
   case "$1" in
     "git")
