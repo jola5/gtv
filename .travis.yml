@@ -8,7 +8,7 @@ env:
     - GIT_VERSION="2.10.4"
     - GIT_VERSION="2.14.1"
 before_script:
-  - "./make git ${GIT_VERSION}"
+  - "./make.sh git ${GIT_VERSION}"
 script:
   - "./make.sh"
 deploy:
