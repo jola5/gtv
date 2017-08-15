@@ -37,6 +37,7 @@ function cmd_git() {
 
   echoBold "\nPreparing for git v${1}"
 
+  mkdir -p "${BUILD_DIR}"
   cd "${BUILD_DIR}"
   wget "https://github.com/git/git/archive/v${1}.tar.gz"
   tar -zxf "v${1}.tar.gz"
