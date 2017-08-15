@@ -158,7 +158,6 @@ case "$1" in
     cmd_help
     ;;
   *)
-    cmd_clean
     cmd_format
     cmd_validate
     cmd_test
