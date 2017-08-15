@@ -132,6 +132,14 @@ function cmd_build() {
   echo "Provided at ${BUILD_DIR}/git-tag-version"
 }
 
+if [ $# -eq 0 ]; then
+  cmd_clean
+  cmd_git ""
+  cmd_format
+  cmd_validate
+  cmd_test "*"
+  cmd_build
+fi
 while test $# -gt 0; do
   case "$1" in
     "git")
