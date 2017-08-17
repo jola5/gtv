@@ -169,7 +169,7 @@ while test $# -gt 0; do
       if [ -n "$2" ]; then shift; fi
       ;;
     "testcov")
-      ${BASHCOV} --root ${WORKSPACE} ${WORKSPACE}/${0} test $2
+      ${BASHCOV} ${WORKSPACE}/${0} test "$2"
       shift
       if [ -n "$2" ]; then shift; fi
       ;;
