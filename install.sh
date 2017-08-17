@@ -74,6 +74,14 @@ function alreadyLatestVersion() {
   echo "gtv is already the latest version installed"
 }
 
+function gtvIsInstalledMessage() {
+  if gtv version &> /dev/null ; then
+    echo "$(gtv version) is available"
+  else
+    echo "gtv installed/updated but it is not found in path"
+  fi
+}
+
 if ! isAlreadyInstalled; then
   installLatestVersion
 else
@@ -84,4 +92,4 @@ else
   fi
 fi
 
-echo "$(gtv version) is available"
+gtvIsInstalledMessage
