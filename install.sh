@@ -2,6 +2,7 @@
 
 # Installs gtv in your system for all users or updates the gtv script
 # if applicable. Needs root privileges.
+# Accepts first argument to contain an alternative installation directory
 
 ################################################################################
 
@@ -29,7 +30,7 @@
 
 ################################################################################
 
-INSTALL_PATH="/usr/local/bin"
+INSTALL_PATH=${1-"/usr/local/bin"}
 GTV_RELEASE_URL="https://api.github.com/repos/jola5/gtv/releases"
 VERSION_GREP="([0-9].){2}[0-9]"
 
@@ -57,7 +58,7 @@ function deleteExistingVersion() {
 }
 
 function installLatestVersion() {
-  echo "installing gtv"
+  echo "installing gtv into '${INSTALL_PATH}'"
   curl -sL "$(curl -sL ${GTV_RELEASE_URL} | grep browser_download_url | head -n 1 | cut -d '"' -f 4)" --output "${INSTALL_PATH}/git-tag-version"
   chmod +x "${INSTALL_PATH}/git-tag-version"
   ln -s "${INSTALL_PATH}/git-tag-version" "${INSTALL_PATH}/gtv"
