@@ -149,7 +149,7 @@ while test $# -gt 0; do
     "git")
       cmd_git "$2"
       shift
-      if [ -z "$2" ]; then shift; fi
+      if [ -n "$2" ]; then shift; fi
       ;;
     "clean")
       cmd_clean
@@ -166,12 +166,12 @@ while test $# -gt 0; do
     "test")
       cmd_test $2
       shift
-      if [ -z "$2" ]; then shift; fi
+      if [ -n "$2" ]; then shift; fi
       ;;
     "testcov")
       ${BASHCOV} --root ${WORKSPACE} ${WORKSPACE}/${0} test $2
       shift
-      if [ -z "$2" ]; then shift; fi
+      if [ -n "$2" ]; then shift; fi
       ;;
     "tag")
       cmd_tag
@@ -180,7 +180,7 @@ while test $# -gt 0; do
     "build")
       cmd_build "$2"
       shift
-      if [ -z "$2" ]; then shift; fi
+      if [ -n "$2" ]; then shift; fi
       ;;
     "help")
       cmd_help
