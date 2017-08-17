@@ -2,12 +2,12 @@
 
 [![Build Status](https://travis-ci.org/jola5/gtv.svg?branch=master)](https://travis-ci.org/jola5/gtv)
 
-This is a script to enable simple versioning of git repositories based on tags following the [semantic versioning](http://semver.org/) scheme: **major.minor.patch**, eg. `1.0.21`. Git tags by default are agnostic to any semantics, see [Git-Basics-Tagging](https://git-scm.com/book/en/v2/Git-Basics-Tagging). Therefore, this script's only purpose is to ease and enforce proper usage of the **semantic versioning scheme**.
+This is a script to enable simple versioning of git repositories based on tags following the [semantic versioning](http://semver.org/) scheme: **MAJOR.MINOR.PATCH**, eg. `1.0.21`. Git tags by default are agnostic to any semantics, see [Git-Basics-Tagging](https://git-scm.com/book/en/v2/Git-Basics-Tagging). Therefore, this script's only purpose is to ease and enforce proper usage of the **semantic versioning scheme**.
 
 Only the SCMs meta data is used to store the version information. No change is made to the repository contents if the version changes. If you bump the version, your **commit does not change**.
 This may or may not be what you are looking for.
 
-Mind: This script may create new versions by adding git tags as you wolud by using `git tag` directly, hence it does not push! Remember to use `git push --tags` to push your locally created tags to your remote repository.
+Mind: This script may create new versions by adding git tags as you wolud by using `git tag` directly, hence it does not push! Remember to use `git push --tags` to make  your locally created tags available at your remote repository.
 
 ## Use Cases
 
@@ -15,7 +15,7 @@ Mind: This script may create new versions by adding git tags as you wolud by usi
 
 1. Change your repository, commit and push.
 1. Your CI is triggered due to the push and checks the repository.
-1. Your CI tests and checks all pass thus you would like to assign this particular commit a new patch version number.
+1. Your CI tests and checks all pass, thus you would like to assign this particular commit a new patch version number.
 1. The CI uses tags to assign a new version number without changing the repository - no new commit is generated.
 
 ### Manually assigning a new version
@@ -27,9 +27,9 @@ Mind: This script may create new versions by adding git tags as you wolud by usi
 
 ## Basic Usage
 
-Refer to the online help by calling ```gtv help``` on the command line for a complete list of supported commands.
+Refer to the online help by calling `gtv help` on the command line for a complete list of supported commands.
 
-``` bash
+```bash
 # initialize by creating a 0.0.0 version
 gtv init
 # show current version, eg. 1.21.3
@@ -59,22 +59,26 @@ gtv set 1.0.0
 For the impatient:
 
 ```bash
+# install or update gtv
 curl -sL https://raw.githubusercontent.com/jola5/gtv/master/install.sh | sudo bash -
 ```
 
-Since gtv is a plain shell script you can literally put it wherever you want and execute it as you would any other script. But putting gtv with the right name in the right place simplifies usage a lot. The installation script above performs these steps:
-
-```bash
-# probably needs root privileges
-cd /usr/local/bin/
-curl -sL $(curl -s https://api.github.com/repos/jola5/gtv/releases | grep browser_download_url | head -n 1 | cut -d '"' -f 4) --output git-tag-version
-chmod +x git-tag-version
-ln -s git-tag-version gtv
-```
-
-This gives you these advantages:
+Since gtv is a plain shell script you can literally put it wherever you want and execute it as you would any other script. But putting gtv with the right name in the right place simplifies usage a lot. The script installs gtv in `/usr/local/bin` thus giving you these advantages:
 1. Gtv is available for all users on your machine
 1. You can access gtv by calling `gtv` directly or via the git alias `git tag-version`
+
+If you want to install gtv in a separate folder you can do so by calling the installation script like this:
+
+```bash
+# install or update in a alternative directory
+curl -sL https://raw.githubusercontent.com/jola5/gtv/master/install.sh | sudo bash /dev/stdin "path/to/my/custom/installation"
+```
+
+Mind, you may be unable to properly call `gtv` and the `git tag-version` alias if your custom folder is not in your search path.
+
+## Updating
+
+You can update gtv by simply calling the installation script again. If there is a newer version your installation is updated. This does not change your configuration settings in any way.
 
 ## Configuration
 
@@ -108,12 +112,26 @@ Create a gtv release artifact with this neat recursive solution:
 make.sh build $(git-tag-version)
 ```
 
-### Test
+For official releases, however, we create a new version tag of the current release commit - with gtv obviously - and push to github. Travis automically builds, tests and verifies this release. If the build is successful, Travis creates the official release artifact on github. Then we can add our release notes manually.
 
-You can execute the [BATS](https://github.com/sstephenson/bats) supported tests with:
+### Format, Validate and Test
+
+[Shfmt](https://github.com/mvdan/sh) is used to format our source code. You should use this before committing your changes to guarantee a consistent source code formatting:
+
+``` bash
+make.sh format
+```
+
+We use [shellcheck](http://www.shellcheck.net/) for static analysis, and [travis lint ](https://docs.travis-ci.com/user/travis-lint/) to check the `.travis.yml` file. Findings of the static analyzer do not fail our build, for exactly this reason we need pay special attention to any messages:
+
+``` bash
+make.sh validate
+```
+
+Finally we perform our [BATS](https://github.com/sstephenson/bats) supported tests with:
 
 ``` bash
 make.sh test
-# you can even execute only specific test targets
+# you can execute specific test targets like this
 make.sh test '05*'
 ```
