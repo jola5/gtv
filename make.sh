@@ -1,13 +1,14 @@
 #!/bin/bash
 
-set -e
-
 WORKSPACE=$(dirname "$(readlink -f "$0")")
 GTV=${WORKSPACE}/src/git-tag-version
+BASHCOV=${BASHCOV-$(which bashcov 2> /dev/null)}
 BUILD_DIR=${WORKSPACE}/build
 TEST_DIR=${WORKSPACE}/test
 TEST_RESULTS=${BUILD_DIR}/test.results
 cd "${WORKSPACE}"
+
+set -e
 
 function echoBold() {
   echo -e "\033[1m${1}\033[0m"
@@ -147,7 +148,8 @@ while test $# -gt 0; do
   case "$1" in
     "git")
       cmd_git "$2"
-      shift 2
+      shift
+      if [ -z "$2" ]; then shift; fi
       ;;
     "clean")
       cmd_clean
@@ -162,8 +164,14 @@ while test $# -gt 0; do
       shift
       ;;
     "test")
-      cmd_test "$2"
-      shift 2
+      cmd_test $2
+      shift
+      if [ -z "$2" ]; then shift; fi
+      ;;
+    "testcov")
+      ${BASHCOV} --root ${WORKSPACE} ${WORKSPACE}/${0} test $2
+      shift
+      if [ -z "$2" ]; then shift; fi
       ;;
     "tag")
       cmd_tag
@@ -172,6 +180,7 @@ while test $# -gt 0; do
     "build")
       cmd_build "$2"
       shift
+      if [ -z "$2" ]; then shift; fi
       ;;
     "help")
       cmd_help

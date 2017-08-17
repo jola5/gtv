@@ -37,13 +37,13 @@ function teardown {
 }
 
 @test "create new patch versions on branches with differing minor versions" {
-  ${GTV} init
+  run ${GTV} init
 
   ${GIT} checkout -b branch_one master
   date >> file
   ${GIT} add *
   ${GIT} commit -m "commit on branch one"
-  ${GTV} new patch
+  run ${GTV} new patch
   run ${GTV}
   [ "$output" = "0.0.1" ]
 
@@ -51,8 +51,8 @@ function teardown {
   date >> file
   ${GIT} add *
   ${GIT} commit -m "commit on branch two"
-  ${GTV} new minor
-  ${GTV} new patch
+  run ${GTV} new minor
+  run ${GTV} new patch
   run ${GTV}
   [ "$output" = "0.1.1" ]
 
@@ -60,19 +60,19 @@ function teardown {
   date >> file
   ${GIT} add *
   ${GIT} commit -m "commit on branch one"
-  ${GTV} new patch
+  run ${GTV} new patch
   run ${GTV}
   [ "$output" = "0.0.2" ]
 }
 
 @test "create new patch versions on branches with differing major versions" {
-  ${GTV} init
+  run ${GTV} init
 
   ${GIT} checkout -b branch_one master
   date >> file
   ${GIT} add *
   ${GIT} commit -m "commit on branch one"
-  ${GTV} new patch
+  run ${GTV} new patch
   run ${GTV}
   [ "$output" = "0.0.1" ]
 
@@ -80,8 +80,8 @@ function teardown {
   date >> file
   ${GIT} add *
   ${GIT} commit -m "commit on branch two"
-  ${GTV} new major
-  ${GTV} new patch
+  run ${GTV} new major
+  run ${GTV} new patch
   run ${GTV}
   [ "$output" = "1.0.1" ]
 
@@ -89,19 +89,19 @@ function teardown {
   date >> file
   ${GIT} add *
   ${GIT} commit -m "commit on branch one"
-  ${GTV} new patch
+  run ${GTV} new patch
   run ${GTV}
   [ "$output" = "0.0.2" ]
 }
 
 @test "create new minor versions on branches with differing major versions" {
-  ${GTV} init
+  run ${GTV} init
 
   ${GIT} checkout -b branch_one master
   date >> file
   ${GIT} add *
   ${GIT} commit -m "commit on branch one"
-  ${GTV} new minor
+  run ${GTV} new minor
   run ${GTV}
   [ "$output" = "0.1.0" ]
 
@@ -109,8 +109,8 @@ function teardown {
   date >> file
   ${GIT} add *
   ${GIT} commit -m "commit on branch two"
-  ${GTV} new major
-  ${GTV} new minor
+  run ${GTV} new major
+  run ${GTV} new minor
   run ${GTV}
   [ "$output" = "1.1.0" ]
 
@@ -118,19 +118,19 @@ function teardown {
   date >> file
   ${GIT} add *
   ${GIT} commit -m "commit on branch one"
-  ${GTV} new minor
+  run ${GTV} new minor
   run ${GTV}
   [ "$output" = "0.2.0" ]
 }
 
 @test "create new patch versions on branches without differing major and minor versions" {
-  ${GTV} init
+  run ${GTV} init
 
   ${GIT} checkout -b branch_one master
   date >> file
   ${GIT} add *
   ${GIT} commit -m "commit on branch one"
-  ${GTV} new patch
+  run ${GTV} new patch
   run ${GTV}
   [ "$output" = "0.0.1" ]
 
@@ -138,19 +138,19 @@ function teardown {
   date >> file
   ${GIT} add *
   ${GIT} commit -m "commit on branch two"
-  ${GTV} new patch
+  run ${GTV} new patch
   run ${GTV}
   [ "$output" = "0.0.2" ]
 }
 
 @test "create new minor versions on branches without differing major and patch versions" {
-  ${GTV} init
+  run ${GTV} init
 
   ${GIT} checkout -b branch_one master
   date >> file
   ${GIT} add *
   ${GIT} commit -m "commit on branch one"
-  ${GTV} new minor
+  run ${GTV} new minor
   run ${GTV}
   [ "$output" = "0.1.0" ]
 
@@ -158,19 +158,19 @@ function teardown {
   date >> file
   ${GIT} add *
   ${GIT} commit -m "commit on branch two"
-  ${GTV} new minor
+  run ${GTV} new minor
   run ${GTV}
   [ "$output" = "0.2.0" ]
 }
 
 @test "create new major versions on branches without differing minor and patch versions" {
-  ${GTV} init
+  run ${GTV} init
 
   ${GIT} checkout -b branch_one master
   date >> file
   ${GIT} add *
   ${GIT} commit -m "commit on branch one"
-  ${GTV} new major
+  run ${GTV} new major
   run ${GTV}
   [ "$output" = "1.0.0" ]
 
@@ -178,7 +178,7 @@ function teardown {
   date >> file
   ${GIT} add *
   ${GIT} commit -m "commit on branch two"
-  ${GTV} new major
+  run ${GTV} new major
   run ${GTV}
   [ "$output" = "2.0.0" ]
 }
