@@ -32,10 +32,6 @@ function teardown {
   rm -rf $TEST_DIR
 }
 
-@test "help" {
-  ${GTV} help
-}
-
 @test "create new patch version with message" {
   EXPECTED="test tag wohooo"
   run ${GTV} init

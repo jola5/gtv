@@ -33,7 +33,11 @@ function teardown {
 }
 
 @test "help" {
-  ${GTV} help
+  run ${GTV} help
+}
+
+@test "version" {
+  run ${GTV} version
 }
 
 @test "show gtv information on uninitialized git repository" {
