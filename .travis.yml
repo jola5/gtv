@@ -16,7 +16,7 @@ env:
 before_script:
   - "gem install bashcov"
 script:
-  - "bashcov ./make.sh clean git format validate test build"
+  - "./make.sh clean git format validate && bashcov ./make.sh test && ./make.sh build"
 deploy:
   provider: releases
   api_key:
