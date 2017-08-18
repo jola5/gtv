@@ -2,7 +2,7 @@
 
 WORKSPACE=$(dirname "$(readlink -f "$0")")
 GTV=${WORKSPACE}/src/git-tag-version
-BASHCOV=${BASHCOV-$(which bashcov 2> /dev/null)}
+SOURCE_DIR=${WORKSPACE}/src
 BUILD_DIR=${WORKSPACE}/build
 TEST_DIR=${WORKSPACE}/test
 TEST_RESULTS=${BUILD_DIR}/test.results
@@ -68,7 +68,10 @@ function cmd_format() {
   chmod +x "${WORKSPACE}/shfmt/shfmt"
   PATH=$PATH:${WORKSPACE}/shfmt
 
-  shfmt -i 2 -w ${GTV}
+  for sourcefile in $(find ${SOURCE_DIR} -type f | sort); do
+    echo -e "\tFormatting '${sourcefile}'"
+    shfmt -i 2 -w ${sourcefile}
+  done
 }
 
 function cmd_test() {
@@ -80,7 +83,7 @@ function cmd_test() {
   date >"${TEST_RESULTS}"
 
   target=$1
-  if [ -z "$target" ]; then
+  if [ -z "${target}" ]; then
     target="*"
   fi
 
@@ -91,8 +94,15 @@ function cmd_test() {
   echo -e "\tGIT is ${GIT}, $(${GIT} --version)"
   echo -e "\tGTV is ${GTV}, $(${GIT} describe)\n"
 
-  env GTV="${GTV}" GIT="${GIT}" bats ${TEST_DIR}/${target}.bats | tee "${TEST_RESULTS}"
-  echo "Test results saved to ${TEST_RESULTS}"
+  fail=0
+  for testfile in $(find ${TEST_DIR} -type f -name "${target}" | sort); do
+    echo -e "\n\tExecuting tests in '${testfile}'"
+    if ! env GTV="${GTV}" GIT="${GIT}" bats "${testfile}"; then
+      fail=1
+    fi
+  done
+
+  [ $fail ]
 }
 
 function cmd_validate() {
@@ -107,7 +117,10 @@ function cmd_validate() {
   # we don't fail on static analysis findings, we fix them best as we can
   set +e
   if shellcheck -V &>/dev/null; then
-    shellcheck "${GTV}"
+    for sourcefile in $(find ${SOURCE_DIR} -type f | sort); do
+      echo -e "\tValidating '${sourcefile}'"
+      shellcheck "${sourcefile}"
+    done
   else
     echoYellow "Skipping static analysis with shellcheck"
   fi
@@ -135,65 +148,75 @@ function cmd_build() {
   echo "Provided at ${BUILD_DIR}/git-tag-version"
 }
 
-# test if there exists at least on file given the globbing patern
-function file-glob-exists() {
-  set +e
-  if ls $1 &> /dev/null; then
-    set -e
-    return 0
-  fi
-  set -e
-  return 1
-}
+GIT_VERSION=${GIT_VERSION-""}
+TEST_TARGET="*"
 
-if [ $# -eq 0 ]; then
-  cmd_clean
-  cmd_git ""
-  cmd_format
-  cmd_validate
-  cmd_test "*"
-  cmd_build
+# get the optional arguments and handle bad arguments
+if ! ARGS=$(getopt -o g:t: -l "git-version:,test-target:" -n "getopt.sh" -- "$@"); then
+  exit 1
 fi
 
-while test $# -gt 0; do
+eval set -- "$ARGS"
+
+while true; do
   case "$1" in
-    "git")
-      cmd_git "$2"
-      shift
-      if [ -n "$2" ]; then shift; fi
-      ;;
-    "clean")
-      cmd_clean
-      shift
-      ;;
-    "format")
-      cmd_format
-      shift
-      ;;
-    "validate")
-      cmd_validate
-      shift
-      ;;
-    "test")
-      cmd_test "$2"
+    -g | --git-version)
+      GIT_VERSION="$2"
       shift 2
       ;;
-    "testcov")
-      ${BASHCOV} ${WORKSPACE}/${0} test
-      shift
+    -t | --test-target)
+      TEST_TARGET="$2"
+      shift 2
       ;;
-    "tag")
-      cmd_tag
+    --)
       shift
-      ;;
-    "build")
-      cmd_build "$2"
-      shift
-      if [ -n "$2" ]; then shift; fi
-      ;;
-    "help")
-      cmd_help
-      shift
+      break
       ;;
   esac
 done
+
+if [ $# -eq 0 ]; then
+  cmd_clean
+  cmd_git "${GIT_VERSION}"
+  cmd_format
+  cmd_validate
+  ${BASHCOV} cmd_test "${TEST_TARGET}"
+  cmd_build
+else
+  while test $# -gt 0; do
+    case "$1" in
+      "git")
+        cmd_git "${GIT_VERSION}"
+        shift 2
+        ;;
+      "clean")
+        cmd_clean
+        shift
+        ;;
+      "format")
+        cmd_format
+        shift
+        ;;
+      "validate")
+        cmd_validate
+        shift
+        ;;
+      "test")
+        cmd_test "${TEST_TARGET}"
+        shift 2
+        ;;
+      "tag")
+        cmd_tag
+        shift
+        ;;
+      "build")
+        cmd_build "$2"
+        shift
+        ;;
+      "help")
+        cmd_help
+        shift
+        ;;
+    esac
+  done
+fi
