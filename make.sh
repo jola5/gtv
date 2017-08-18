@@ -135,6 +135,17 @@ function cmd_build() {
   echo "Provided at ${BUILD_DIR}/git-tag-version"
 }
 
+# test if there exists at least on file given the globbing patern
+function file-glob-exists() {
+  set +e
+  if ls $1 &> /dev/null; then
+    set -e
+    return 0
+  fi
+  set -e
+  return 1
+}
+
 if [ $# -eq 0 ]; then
   cmd_clean
   cmd_git ""
@@ -164,14 +175,12 @@ while test $# -gt 0; do
       shift
       ;;
     "test")
-      cmd_test $2
-      shift
-      if [ -n "$2" ]; then shift; fi
+      cmd_test "$2"
+      shift 2
       ;;
     "testcov")
-      ${BASHCOV} ${WORKSPACE}/${0} test "$2"
+      ${BASHCOV} ${WORKSPACE}/${0} test
       shift
-      if [ -n "$2" ]; then shift; fi
       ;;
     "tag")
       cmd_tag
