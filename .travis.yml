@@ -10,15 +10,11 @@ addons:
 env:
   matrix:
     - GIT_VERSION=""
-    - GIT_VERSION="1.9.5"
-    - GIT_VERSION="2.2.3"
-    - GIT_VERSION="2.6.7"
-    - GIT_VERSION="2.10.4"
     - GIT_VERSION="2.14.1"
 before_script:
   - "gem install bashcov"
 script:
-  - "./make.sh clean git \"${GIT_VERSION}\" format validate testcov build"
+  - "bashcov ./make.sh clean git format validate test build"
 deploy:
   provider: releases
   api_key:
