@@ -42,11 +42,12 @@ COMMAND
 }
 
 function cmd_git() {
+  echoBold "\nPreparing Git version"
   if [ -z "${1}" ]; then
-    echoBold "\nSystem default $(git --version)"
+    echoMagenta "Using system default $(git --version)"
     export GIT=$(which git)
   else
-    echoBold "\nPreparing for git v${1}"
+    echoMagenta "Compiling custom git version ${1}"
     mkdir -p "${BUILD_DIR}"
     cd "${BUILD_DIR}"
     wget "https://github.com/git/git/archive/v${1}.tar.gz"
@@ -64,8 +65,10 @@ function cmd_git() {
 
 function cmd_clean() {
   echoBold "\nCleaning up"
-  rm -rf "${BUILD_DIR}"
-  rm -rf "${COVERAGE_DIR}"
+  for directory in "${BUILD_DIR}" "${COVERAGE_DIR}"; do
+    echoMagenta "Cleaning '${directory}'"
+    rm -rf ${directory}
+  done
 }
 
 function cmd_format() {
@@ -78,7 +81,7 @@ function cmd_format() {
   PATH=$PATH:${WORKSPACE}/shfmt
 
   for sourcefile in $(find ${SOURCE_DIR} -type f | sort); do
-    echo -e "\tFormatting '${sourcefile}'"
+    echoMagenta "Formatting '${sourcefile}'"
     shfmt -i 2 -w ${sourcefile}
   done
 }
@@ -100,11 +103,10 @@ function cmd_test() {
   fi
 
   echo -e "\tGIT is ${GIT}, $(${GIT} --version)"
-  echo -e "\tGTV is ${GTV}, $(${GIT} describe)\n"
 
   fail=0
   for testfile in $(find ${TEST_DIR} -type f -name "${target}" | sort); do
-    echoMagenta "\nExecuting tests in '${testfile}'"
+    echoMagenta "\nExecuting '${testfile}'"
     if ! env GTV="${GTV}" GIT="${GIT}" ${BATS} "${testfile}"; then
       fail=1
     fi
@@ -124,9 +126,6 @@ function cmd_coverage() {
     export GIT=$(which git)
   fi
 
-  echo -e "\tGIT is ${GIT}, $(${GIT} --version)"
-  echo -e "\tGTV is ${GTV}, $(${GIT} describe)\n"
-
   env GTV="${GTV}" GIT="${GIT}" ${BASHCOV} --root ${WORKSPACE} --mute ${BATS} ${TEST_DIR}/*.bats 2> /dev/null
 }
 
@@ -134,6 +133,7 @@ function cmd_validate() {
   echoBold "\nValidating files"
   bash -n "${GTV}"
   if travis &>/dev/null; then
+    echoMagenta "Validating '${WORKSPACE}/.travis.yml'"
     travis lint "${WORKSPACE}/.travis.yml"
   else
     echoYellow "Skipping travis file validation"
@@ -143,7 +143,7 @@ function cmd_validate() {
   set +e
   if shellcheck -V &>/dev/null; then
     for sourcefile in $(find ${SOURCE_DIR} -type f | sort); do
-      echo -e "\tValidating '${sourcefile}'"
+      echoMagenta "Validating '${sourcefile}'"
       shellcheck "${sourcefile}"
     done
   else
