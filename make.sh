@@ -90,7 +90,7 @@ function cmd_test() {
   mkdir -p "${WORKSPACE}/build"
   # make bats available and execute tests
   git clone https://github.com/sstephenson/bats.git &>/dev/null || : # do not abort if clone exists
-  PATH=$PATH:${WORKSPACE}/bats/bin
+  export BATS="$(find ./ -type f -executable -name 'bats' | xargs readlink -f)"
 
   target=$1
   if [ -z "${target}" ]; then
@@ -101,6 +101,7 @@ function cmd_test() {
   GIT=${GIT-$(which git)}
 
   echo -e "\tGIT is ${GIT}, $(${GIT} --version)"
+  echo -e "\tBATS is ${BATS}, $(${BATS} --version)"
 
   fail=0
   for testfile in $(find ${TEST_DIR} -type f -name "${target}" | sort); do
