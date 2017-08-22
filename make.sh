@@ -1,11 +1,15 @@
 #!/bin/bash
 
 WORKSPACE=$(dirname "$(readlink -f "$0")")
-GTV=${WORKSPACE}/src/git-tag-version
 SOURCE_DIR=${WORKSPACE}/src
 BUILD_DIR=${WORKSPACE}/build
+COVERAGE_DIR=${WORKSPACE}/coverage
 TEST_DIR=${WORKSPACE}/test
-TEST_RESULTS=${BUILD_DIR}/test.results
+
+GTV=${WORKSPACE}/src/git-tag-version
+BASHCOV=${BASHCOV-$(which bashcov)}
+BATS=${BATS-$(which bats)}
+
 cd "${WORKSPACE}"
 
 set -e
@@ -18,6 +22,10 @@ function echoYellow() {
   echo -e "\033[1;33m${1}\033[0m"
 }
 
+function echoMagenta() {
+  echo -e "\033[1;95m${1}\033[0m"
+}
+
 function cmd_help() {
   echo "$0 COMMAND
 
@@ -26,7 +34,7 @@ COMMAND
   format          format the source files
   validate        valadite source and travis files
   clean           clean any existing build artifacts
-  test [target]   run tests, returns 0 on success, test results in \"TEST_RESULTS\", for targets see \"${TEST_DIR}\"
+  test [target]   run tests, returns 0 on success, for targets see \"${TEST_DIR}\"
   tag             create a new patch version
   build           create a release artifact in \"${BUILD_DIR}/git-tag-version\"
   git <version>   prepare build for the given git version, eg. \"2.14.1\" (used to test against different git versions)
@@ -56,7 +64,8 @@ function cmd_git() {
 
 function cmd_clean() {
   echoBold "\nCleaning up"
-  rm -rfv "${BUILD_DIR}"
+  rm -rf "${BUILD_DIR}"
+  rm -rf "${COVERAGE_DIR}"
 }
 
 function cmd_format() {
@@ -80,7 +89,6 @@ function cmd_test() {
   # make bats available and execute tests
   git clone https://github.com/sstephenson/bats.git &>/dev/null || : # do not abort if clone exists
   PATH=$PATH:${WORKSPACE}/bats/bin
-  date >"${TEST_RESULTS}"
 
   target=$1
   if [ -z "${target}" ]; then
@@ -96,13 +104,30 @@ function cmd_test() {
 
   fail=0
   for testfile in $(find ${TEST_DIR} -type f -name "${target}" | sort); do
-    echo -e "\n\tExecuting tests in '${testfile}'"
-    if ! env GTV="${GTV}" GIT="${GIT}" bats "${testfile}"; then
+    echoMagenta "\nExecuting tests in '${testfile}'"
+    if ! env GTV="${GTV}" GIT="${GIT}" ${BATS} "${testfile}"; then
       fail=1
     fi
   done
 
   [ $fail ]
+}
+
+function cmd_coverage() {
+  echoBold "\nGenerating coverage report"
+  mkdir -p "${WORKSPACE}/coverage"
+  # make bats available and execute tests
+  git clone https://github.com/sstephenson/bats.git &>/dev/null || : # do not abort if clone exists
+  PATH=$PATH:${WORKSPACE}/bats/bin
+
+  if [ -z "${GIT}" ]; then
+    export GIT=$(which git)
+  fi
+
+  echo -e "\tGIT is ${GIT}, $(${GIT} --version)"
+  echo -e "\tGTV is ${GTV}, $(${GIT} describe)\n"
+
+  env GTV="${GTV}" GIT="${GIT}" ${BASHCOV} --root ${WORKSPACE} --mute ${BATS} ${TEST_DIR}/*.bats 2> /dev/null
 }
 
 function cmd_validate() {
@@ -180,7 +205,8 @@ if [ $# -eq 0 ]; then
   cmd_git "${GIT_VERSION}"
   cmd_format
   cmd_validate
-  ${BASHCOV} cmd_test "${TEST_TARGET}"
+  cmd_test "${TEST_TARGET}"
+  cmd_coverage
   cmd_build
 else
   while test $# -gt 0; do
@@ -193,6 +219,10 @@ else
         cmd_clean
         shift
         ;;
+      "coverage")
+        cmd_coverage
+        shift
+        ;;
       "format")
         cmd_format
         shift
@@ -203,7 +233,7 @@ else
         ;;
       "test")
         cmd_test "${TEST_TARGET}"
-        shift 2
+        shift
         ;;
       "tag")
         cmd_tag

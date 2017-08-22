@@ -1,1 +1,2 @@
-SimpleCov.add_filter "tmp/bats.*.src"
+SimpleCov.add_filter "install.sh"
+SimpleCov.add_filter "make.sh"

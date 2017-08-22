@@ -36,7 +36,8 @@ GTV_VERSION="UNRELEASED"
 
 # display help
 function help() {
-  echo "NAME
+  echo <<EOHELP
+NAME
         git-tag-version
 
 SYNOPSIS
@@ -159,7 +160,7 @@ EXAMPLES
         git show \$(git describe)
         # ERROR!!! Not a strictly increaing number
         gtv set 1.0.0
-"
+EOHELP
 }
 
 # print red error messages to stderr
