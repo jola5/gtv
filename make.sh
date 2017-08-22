@@ -8,7 +8,6 @@ TEST_DIR=${WORKSPACE}/test
 
 GTV=${WORKSPACE}/src/git-tag-version
 BASHCOV=${BASHCOV-$(which bashcov)}
-BATS=${BATS-$(which bats)}
 
 cd "${WORKSPACE}"
 
@@ -98,9 +97,8 @@ function cmd_test() {
     target="*.bats"
   fi
 
-  if [ -z "${GIT}" ]; then
-    export GIT=$(which git)
-  fi
+  BATS=${BATS-$(which bats)}
+  GIT=${GIT-$(which git)}
 
   echo -e "\tGIT is ${GIT}, $(${GIT} --version)"
 
@@ -122,9 +120,7 @@ function cmd_coverage() {
   git clone https://github.com/sstephenson/bats.git &>/dev/null || : # do not abort if clone exists
   PATH=$PATH:${WORKSPACE}/bats/bin
 
-  if [ -z "${GIT}" ]; then
-    export GIT=$(which git)
-  fi
+  BATS=${BATS-$(which bats)}
 
   env GTV="${GTV}" GIT="${GIT}" ${BASHCOV} --root ${WORKSPACE} --mute ${BATS} ${TEST_DIR}/*.bats 2> /dev/null
 }
