@@ -95,7 +95,7 @@ function cmd_test() {
 
   target=$1
   if [ -z "${target}" ]; then
-    target="*"
+    target="*.bats"
   fi
 
   if [ -z "${GIT}" ]; then
