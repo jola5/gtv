@@ -124,8 +124,9 @@ function cmd_coverage() {
   PATH=$PATH:${WORKSPACE}/bats/bin
 
   BATS=${BATS-$(which bats)}
+  GIT=${GIT-$(which git)}
 
-  env GTV="${GTV}" GIT="${GIT}" ${BASHCOV} --root ${WORKSPACE} ${BATS} "$(echo "$(find ${TEST_DIR} -name '*.bats')")" # 2> /dev/null
+  env GTV="${GTV}" GIT="${GIT}" ${BASHCOV} --root ${WORKSPACE} ${BATS} $(echo -e "$(find ${TEST_DIR} -type f -print0 -name '*.bats' | tr '\0' ' ')") # 2> /dev/null
 }
 
 function cmd_validate() {
