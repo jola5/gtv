@@ -120,3 +120,56 @@ function teardown {
   run ${GTV} show
   [ "$output" = "1.2.3${DELIMITER}${SUFFIX}" ]
 }
+
+@test "create new patch version with message and suffix" {
+  SUFFIX=wohooSuffix
+  MESSAGE="test tag wohooo"
+  run ${GTV} init
+  run ${GTV} new patch --suffix "${SUFFIX}" --message "${MESSAGE}"
+  run ${GTV} show
+  [ "$output" = "0.0.1-${SUFFIX}" ]
+  RESULT=$(${GIT} tag --list "v0.0.1-${SUFFIX}" -n99 | tail -n1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+  echo "RESULT ${RESULT}"
+  echo "MESSAGE ${RESULT}"
+  [ "$RESULT" = "${MESSAGE}" ]
+}
+
+@test "create new minor version with message and suffix" {
+  SUFFIX=wohooSuffix
+  MESSAGE="test tag wohooo"
+  run ${GTV} init
+  run ${GTV} new minor --suffix "${SUFFIX}" --message "${MESSAGE}"
+  run ${GTV} show
+  [ "$output" = "0.1.0-${SUFFIX}" ]
+  RESULT=$(${GIT} tag --list "v0.1.0-${SUFFIX}" -n99 | tail -n1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+  echo "RESULT ${RESULT}"
+  echo "MESSAGE ${RESULT}"
+  [ "$RESULT" = "${MESSAGE}" ]
+}
+
+@test "create new major version with message and suffix" {
+  SUFFIX=wohooSuffix
+  MESSAGE="test tag wohooo"
+  run ${GTV} init
+  run ${GTV} new major --suffix "${SUFFIX}" --message "${MESSAGE}"
+  run ${GTV} show
+  [ "$output" = "1.0.0-${SUFFIX}" ]
+  RESULT=$(${GIT} tag --list "v1.0.0-${SUFFIX}" -n99 | tail -n1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+  echo "RESULT ${RESULT}"
+  echo "MESSAGE ${RESULT}"
+  [ "$RESULT" = "${MESSAGE}" ]
+}
+
+@test "set new specific version with message and suffix" {
+  SUFFIX=wohooSuffix
+  MESSAGE="test tag wohooo"
+  run ${GTV} init
+  run ${GTV} set 1.2.3
+  run ${GTV} set 1.2.3 --suffix "${SUFFIX}" --non-strict --message "${MESSAGE}"
+  run ${GTV} show
+  [ "$output" = "1.2.3-${SUFFIX}" ]
+  RESULT=$(${GIT} tag --list "v1.2.3-${SUFFIX}" -n99 | tail -n1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+  echo "RESULT ${RESULT}"
+  echo "MESSAGE ${MESSAGE}"
+  [ "$RESULT" = "${MESSAGE}" ]
+}
