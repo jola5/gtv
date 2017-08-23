@@ -12,7 +12,7 @@ env:
     - GIT_VERSION=""
     - GIT_VERSION="2.14.1"
 before_script:
-  - "gem install bashcov"
+  - "gem install simplecov coveralls bashcov"
 script:
   - "bash -xv ./make.sh"
 deploy:
