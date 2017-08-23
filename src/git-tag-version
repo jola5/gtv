@@ -36,7 +36,7 @@ GTV_VERSION="UNRELEASED"
 
 # display help
 function help() {
-  echo <<EOHELP
+  cat <<EOHELP
 NAME
         git-tag-version
 

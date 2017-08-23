@@ -34,10 +34,12 @@ function teardown {
 
 @test "help" {
   run ${GTV} help
+  [[ "$output" == *"git-tag-version"* ]]
 }
 
 @test "version" {
   run ${GTV} version
+  [[ "$output" == "git-tag-version version"* ]]
 }
 
 @test "show gtv information on uninitialized git repository" {
