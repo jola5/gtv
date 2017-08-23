@@ -8,8 +8,10 @@ addons:
     packages:
     - shellcheck
 env:
-  matrix:
-    - GIT_VERSION=""
+  - GIT_VERSION=""
+  - GIT_VERSION="2.14.1"
+matrix:
+  allow_failures:
     - GIT_VERSION="2.14.1"
 before_script:
   - "gem install simplecov coveralls bashcov"
