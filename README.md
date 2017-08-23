@@ -1,6 +1,7 @@
 # Git Tag Version
 
 [![Build Status](https://travis-ci.org/jola5/gtv.svg?branch=master)](https://travis-ci.org/jola5/gtv)
+[![Coverage Status](https://coveralls.io/repos/github/jola5/gtv/badge.svg?branch=support-coverage)](https://coveralls.io/github/jola5/gtv?branch=support-coverage)
 
 This is a script to enable simple versioning of git repositories based on tags following the [semantic versioning](http://semver.org/) scheme: **MAJOR.MINOR.PATCH**, eg. `1.0.21`. Git tags by default are agnostic to any semantics, see [Git-Basics-Tagging](https://git-scm.com/book/en/v2/Git-Basics-Tagging). Therefore, this script's only purpose is to ease and enforce proper usage of the **semantic versioning scheme**.
 
