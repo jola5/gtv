@@ -14,7 +14,7 @@ matrix:
   allow_failures:
     - GIT_VERSION="2.14.1"
 before_script:
-  - "gem install simplecov coveralls bashcov"
+  - "gem install simplecov:0.14.1 coveralls:0.8.21 bashcov:1.5.1"
 script:
   - "bash -xv ./make.sh"
 after_success: coveralls
