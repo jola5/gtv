@@ -15,6 +15,7 @@ before_script:
   - "gem install simplecov coveralls bashcov"
 script:
   - "bash -xv ./make.sh"
+after_success: coveralls
 deploy:
   provider: releases
   api_key:
