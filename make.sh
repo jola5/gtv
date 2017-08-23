@@ -59,6 +59,8 @@ function cmd_git() {
     export GIT="$(find ./ -maxdepth 1 -type f -executable -name 'git' | xargs readlink -f)"
   fi
 
+  cd "${WORKSPACE}"
+
   echo "Using GIT=${GIT}"
 }
 
@@ -88,7 +90,7 @@ function cmd_format() {
 function cmd_test() {
   echoBold "\nExecuting tests"
   mkdir -p "${WORKSPACE}/build"
-  # make bats available and execute tests
+  cd ${WORKSPACE}
   git clone https://github.com/sstephenson/bats.git &>/dev/null || : # do not abort if clone exists
   export BATS="$(find ./ -type f -executable -name 'bats' | xargs readlink -f)"
 
@@ -117,7 +119,7 @@ function cmd_test() {
 function cmd_coverage() {
   echoBold "\nGenerating coverage report"
   mkdir -p "${WORKSPACE}/coverage"
-  # make bats available and execute tests
+  cd ${WORKSPACE}
   git clone https://github.com/sstephenson/bats.git &>/dev/null || : # do not abort if clone exists
   PATH=$PATH:${WORKSPACE}/bats/bin
 
@@ -210,7 +212,7 @@ else
     case "$1" in
       "git")
         cmd_git "${GIT_VERSION}"
-        shift 2
+        shift
         ;;
       "clean")
         cmd_clean

@@ -408,7 +408,7 @@ while true; do
     -m | --message)
       shift
       if [ -n "$1" ]; then
-        MESSAGE=$1
+        MESSAGE="$1"
         shift
       fi
       ;;
