@@ -9,14 +9,11 @@ addons:
     - shellcheck
 env:
   - GIT_VERSION=""
-  - GIT_VERSION="2.14.1"
-matrix:
-  allow_failures:
-    - env: GIT_VERSION="2.14.1"
+  - GIT_VERSION="2.14.3"
 before_script:
-  - "gem install simplecov:0.14.1 coveralls:0.8.21 bashcov:1.5.1"
+  - "gem install simplecov:0.15.1 coveralls:0.8.21 bashcov:1.6.0"
 script:
-  - "bash -xv ./make.sh"
+  - "bash ./make.sh"
 deploy:
   provider: releases
   api_key:
